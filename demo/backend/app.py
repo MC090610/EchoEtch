@@ -6,10 +6,10 @@ from __future__ import annotations
 依赖安装：
   pip install flask flask-cors python-dotenv requests Pillow
 
-API Key 配置（任选一种）：
-  1. 硅基流动（国内，推荐）：https://siliconflow.cn
-  2. OpenAI API（需要代理）
-  3. 其他 OpenAI 兼容接口
+API Key 配置：
+  LLM: 硅基流动 Qwen（OpenAI 兼容接口，国内可用）
+  ASR: 硅基流动 Whisper（语音转文字）
+  TTS: 小米 MiMo（公共 API，OpenAI 兼容 chat/completions）
 
 环境变量设置：
   export OPENAI_API_KEY="sk-xxx"
@@ -18,19 +18,25 @@ API Key 配置（任选一种）：
   export OPENAI_MODEL_TEXT="Qwen/Qwen2.5-72B-Instruct"       # 文本模型
   export WHISPER_URL="https://api.siliconflow.cn/v1"        # Whisper API（硅基流动）
   export WHISPER_API_KEY="sk-xxx"
-  export DOBAO_TTS_URL="https://db.heang.top"               # db.heang.top TTS 接口地址
-  export DOBAO_TTS_USER="heang"                              # TTS 用户名
-  export DOBAO_TTS_PASSWORD=""                               # TTS 密码（必填，否则 TTS 不可用）
-  export DOBAO_TTS_VOICE="zh_female_wenroutaozi_uranus_bigtts"  # TTS 音色
+  export MIMO_TTS_API_KEY="sk-xxx"                            # 小米 MiMo TTS
+  export MIMO_TTS_VOICE="茉莉"                                # 音色: mimo_default, 冰糖, 茉莉, 苏打, 白桦, Mia, Chloe, Milo, Dean
 """
 
 import os
 import io
+import sys
 import json
 import uuid
 import base64
 import datetime
 from pathlib import Path
+
+# Windows 控制台默认 GBK,无法打印 ✓/⚠ 等 Unicode 符号,统一重配 UTF-8
+try:
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8")
+except Exception:
+    pass
 
 # 加载 .env 文件（优先级：系统环境变量 > .env 文件）
 try:
@@ -66,25 +72,25 @@ MODEL_TEXT = os.getenv("OPENAI_MODEL_TEXT", "Qwen/Qwen2.5-72B-Instruct")
 WHISPER_URL = os.getenv("WHISPER_URL", "https://api.siliconflow.cn/v1")
 WHISPER_API_KEY = os.getenv("WHISPER_API_KEY", "") or OPENAI_API_KEY
 
-# db.heang.top TTS 配置
-DOBAO_TTS_URL = os.getenv("DOBAO_TTS_URL", "https://db.heang.top")
-DOBAO_TTS_USER = os.getenv("DOBAO_TTS_USER", "heang")
-DOBAO_TTS_PASSWORD = os.getenv("DOBAO_TTS_PASSWORD", "")
-DOBAO_TTS_VOICE = os.getenv("DOBAO_TTS_VOICE", "zh_female_wenroutaozi_uranus_bigtts")
+# 小米 MiMo TTS 配置
+MIMO_TTS_BASE_URL = os.getenv("MIMO_TTS_BASE_URL", "https://api.xiaomimimo.com/v1")
+MIMO_TTS_API_KEY = os.getenv("MIMO_TTS_API_KEY", "")
+MIMO_TTS_MODEL = os.getenv("MIMO_TTS_MODEL", "mimo-v2.5-tts")
+MIMO_TTS_VOICE = os.getenv("MIMO_TTS_VOICE", "茉莉")  # 可选: mimo_default, 冰糖, 茉莉, 苏打, 白桦, Mia, Chloe, Milo, Dean
 
 # 启动时打印配置状态
 print("=" * 50)
 print("《聲畫合鳴》v2 - 完整版（含图片识别+语音转文字）")
 print("=" * 50)
-_demo = not (OPENAI_API_KEY and WHISPER_API_KEY and DOBAO_TTS_PASSWORD)
+_demo = not (OPENAI_API_KEY and WHISPER_API_KEY and MIMO_TTS_API_KEY)
 if _demo:
     print(f"⚠ LLM: {'已配置' if OPENAI_API_KEY else '未配置 API Key，运行 Demo 模式'}")
     print(f"⚠ Whisper: {'已配置' if WHISPER_API_KEY else '未配置 API Key，语音识别用占位文本'}")
-    print(f"✗ TTS: {'已配置' if DOBAO_TTS_PASSWORD else '未配置 DOBAO_TTS_PASSWORD，音频不可用'}")
+    print(f"⚠ TTS: {'已配置' if MIMO_TTS_API_KEY else '未配置 MIMO_TTS_API_KEY，音频不可用'}")
 else:
     print("✓ LLM: 已配置")
     print("✓ Whisper: 已配置")
-    print("✓ TTS: 已配置")
+    print("✓ TTS: 已配置 (小米 MiMo)")
     print("访问地址：http://localhost:8721")
 
 # 数据存储
@@ -304,37 +310,43 @@ def transcribe_audio(audio_data: bytes, filename="voice.webm") -> str:
 
 
 # ========================
-# TTS 音频生成
+# TTS 音频生成（小米 MiMo 公共 API，走 chat/completions）
 # ========================
+TTS_TONE_PROMPT = "温柔、平静、像深夜电台独白一样的语气，节奏缓慢，带有治愈感和陪伴感"
+
+
 def generate_tts(text: str) -> str | None:
-    """调用 db.heang.top 生成 TTS 音频，返回公开 MP3 URL"""
-    if not DOBAO_TTS_PASSWORD:
-        print("[TTS] 未配置 DOBAO_TTS_PASSWORD，跳过 TTS 生成")
+    """调用小米 MiMo TTS（/v1/chat/completions），解码 base64 音频落盘，返回 /api/audio/<filename>"""
+    if not MIMO_TTS_API_KEY:
+        print("[TTS] 未配置 MIMO_TTS_API_KEY，跳过 TTS 生成")
         return None
 
     try:
-        import base64
-        auth = base64.b64encode(f"{DOBAO_TTS_USER}:{DOBAO_TTS_PASSWORD}".encode()).decode()
         resp = requests.post(
-            f"{DOBAO_TTS_URL}/api/tts",
+            f"{MIMO_TTS_BASE_URL}/chat/completions",
             headers={
-                "Authorization": f"Basic {auth}",
+                "Authorization": f"Bearer {MIMO_TTS_API_KEY}",
                 "Content-Type": "application/json",
             },
             json={
-                "text": text,
-                "speaker": DOBAO_TTS_VOICE,
-                "rate": 0,
-                "pitch": 0,
+                "model": MIMO_TTS_MODEL,
+                "messages": [
+                    {"role": "user", "content": TTS_TONE_PROMPT},
+                    {"role": "assistant", "content": text},
+                ],
+                "audio": {"voice": MIMO_TTS_VOICE, "format": "wav"},
             },
-            timeout=30,  # 从 180s 降到 30s，避免前端超时
+            timeout=60,
         )
         resp.raise_for_status()
-        data = resp.json().get("data", resp.json())
-        audio_url = data.get("storageUrl") or data.get("url") or data.get("local_url")
-        if audio_url and audio_url.startswith("/"):
-            audio_url = f"{DOBAO_TTS_URL}{audio_url}"
-        return audio_url
+        data = resp.json()
+        audio_b64 = data["choices"][0]["message"]["audio"]["data"]
+        audio_bytes = base64.b64decode(audio_b64)
+
+        filename = f"{uuid.uuid4().hex[:8]}.wav"
+        filepath = AUDIO_DIR / filename
+        filepath.write_bytes(audio_bytes)
+        return f"/api/audio/{filename}"
     except Exception as e:
         print(f"[TTS 失败] {e}")
         return None
@@ -371,7 +383,7 @@ def api_status():
         "demo_mode": demo_mode,
         "has_api_key": bool(OPENAI_API_KEY),
         "has_whisper": bool(WHISPER_API_KEY),
-        "has_tts": bool(DOBAO_TTS_PASSWORD),
+        "has_tts": bool(MIMO_TTS_API_KEY),
         "message": "Demo 模式：语音识别和 TTS 使用占位文本" if demo_mode else "正常模式",
     })
 
@@ -398,7 +410,7 @@ def api_generate():
     生成回声
     支持三种输入：
     1. text: 文字直接输入
-    2. image / doodle: 图片或涂鸦（base64），自动识别 + 生成叙事
+    2. image: 图片（base64），自动识别 + 生成叙事
     3. voice: 语音（binary），自动转文字 + 生成叙事
     """
     data = request.get_json() or {}
@@ -412,19 +424,15 @@ def api_generate():
             return jsonify({"error": "内容不能为空"}), 400
         narrative = generate_narrative(user_content)
 
-    # ---- 图片 / 涂鸦输入 ----
-    elif input_type in ("image", "doodle"):
+    # ---- 图片输入 ----
+    elif input_type == "image":
         img_b64 = data.get("content", "")  # base64 字符串
         if not img_b64:
-            return jsonify({"error": "图片或涂鸦不能为空"}), 400
+            return jsonify({"error": "图片不能为空"}), 400
         try:
-            # 浏览器 FileReader/canvas 导出的内容是 data:image/...;base64,...
-            # 去掉前缀后再严格解码，避免把 MIME 元数据当作图像字节。
-            if img_b64.startswith("data:"):
-                img_b64 = img_b64.split(",", 1)[1]
-            image_data = base64.b64decode(img_b64, validate=True)
+            image_data = base64.b64decode(img_b64)
         except Exception:
-            return jsonify({"error": "图片或涂鸦格式错误"}), 400
+            return jsonify({"error": "图片格式错误"}), 400
         narrative = process_image(image_data)
 
     # ---- 语音输入 ----
@@ -549,10 +557,10 @@ if __name__ == "__main__":
             print("✗ Whisper: 未配置（语音转文字不可用）")
     else:
         print("⚠ LLM: 未配置 API Key，运行 Demo 模式")
-    if DOBAO_TTS_PASSWORD:
-        print(f"✓ TTS: {DOBAO_TTS_URL} (音色: {DOBAO_TTS_VOICE})")
+    if MIMO_TTS_API_KEY:
+        print(f"✓ TTS: 小米 MiMo (音色: {MIMO_TTS_VOICE})")
     else:
-        print("✗ TTS: 未配置 DOBAO_TTS_PASSWORD")
+        print("✗ TTS: 未配置 MIMO_TTS_API_KEY")
     print(f"访问地址：http://localhost:8721")
     print("=" * 44)
     app.run(host="0.0.0.0", port=8721, debug=True)

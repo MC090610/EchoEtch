@@ -17,7 +17,7 @@
 </p>
 
 <p align="center">
-  <a href="https://sshm.heang.top">在线演示</a> · <a href="https://sshm.heang.top/preview">路演预览</a> · <a href="ARCHITECTURE.md">架构文档</a> · <a href="《聲畫合鳴》完整产品需求分析书（PRD）.md">产品需求文档</a>
+  <a href="http://localhost:8721">在线演示</a> · <a href="http://localhost:8721/preview">路演预览</a> · <a href="ARCHITECTURE.md">架构文档</a> · <a href="《聲畫合鳴》完整产品需求分析书（PRD）.md">产品需求文档</a>
 </p>
 
 ---
@@ -60,7 +60,7 @@
 | 拍照上传 | ✅ | 视觉模型识别图片内容，生成叙事 |
 | 语音输入 | ✅ | Whisper 语音转文字 → 叙事生成 |
 | AI 叙事生成 | ✅ | LLM 生成 100-150 字冥想式文本 |
-| TTS 语音合成 | ✅ | db.heang.top 接口，温柔女声音色 |
+| TTS 语音合成 | ✅ | 小米 MiMo TTS 公共 API，温柔女声音色 |
 | 回声卡片 | ✅ | 叙事展示 + 音频播放 |
 | 回声日记 | ✅ | 日历视图 + 按日浏览历史记录 |
 | Demo 模式 | ✅ | 无需任何 API Key 即可体验完整流程 |
@@ -125,18 +125,16 @@ OPENAI_MODEL_TEXT=Qwen/Qwen2.5-72B-Instruct
 WHISPER_URL=https://api.siliconflow.cn/v1
 WHISPER_API_KEY=sk-your-key
 
-# ---- TTS 语音合成 ----
-DOBAO_TTS_URL=https://db.heang.top
-DOBAO_TTS_USER=heang
-DOBAO_TTS_PASSWORD=your-password
-DOBAO_TTS_VOICE=zh_female_wenroutaozi_uranus_bigtts
+# ---- TTS 语音合成（小米 MiMo 公共 API）----
+MIMO_TTS_API_KEY=sk-your-key
+MIMO_TTS_VOICE=茉莉                    # 可选: mimo_default, 冰糖, 茉莉, 苏打, 白桦, Mia, Chloe, Milo, Dean
 ```
 
 | 配置项 | 用途 | 未配置时 |
 |--------|------|---------|
 | `OPENAI_API_KEY` | LLM 叙事生成 + 视觉模型 | Demo 模式，返回预设叙事 |
 | `WHISPER_API_KEY` | 语音转文字 | 返回占位文本 `[语音录入]` |
-| `DOBAO_TTS_PASSWORD` | TTS 音频合成 | 跳过音频，仅展示文字 |
+| `MIMO_TTS_API_KEY` | TTS 音频合成（小米 MiMo） | 跳过音频，仅展示文字 |
 
 > **推荐**：[硅基流动 SiliconFlow](https://siliconflow.cn) 提供 OpenAI 兼容接口，国内可用，免费额度覆盖 Qwen 系列模型。
 
@@ -174,7 +172,7 @@ EchoEtch/
 | 前端 | HTML / CSS / JS | 移动端优先，Tailwind CSS |
 | LLM | Qwen2-VL-72B / Qwen2.5-72B | 通过 SiliconFlow OpenAI 兼容接口调用 |
 | 语音识别 | Whisper (SenseVoice) | SiliconFlow 平台，中文优化 |
-| 语音合成 | db.heang.top TTS | 豆包 TTS 接口，温柔女声音色 |
+| 语音合成 | 小米 MiMo TTS | 小米公共 API，温柔女声音色 |
 | 配置管理 | python-dotenv | 从 `.env` 文件加载环境变量 |
 
 ---
