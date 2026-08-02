@@ -1,0 +1,49 @@
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+Pipfile.lock
+poetry.lock
+
+# ===== Env & Secrets =====
+.env
+.env.*
+!.env.example
+!.env.template
+
+# ===== IDE =====
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ===== Logs =====
+*.log
+logs/
+
+# ===== Node (if any) =====
+node_modules/
+package-lock.json
+yarn.lock
+
+# ===== Data =====
+*.db
+*.sqlite
+*.sqlite3
+demo/data/audio/*.mp3
+demo/data/audio/*.wav
+demo/data/audio/*.webm
+
+# ===== Temp =====
+*.tmp
+*.bak
+temp/

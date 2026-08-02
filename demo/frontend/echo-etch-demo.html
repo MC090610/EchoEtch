@@ -1,0 +1,2138 @@
+<!doctype html>
+<html lang="zh-CN" data-mode="adult">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="canvas:aspect-ratio" content="9:16">
+<title>聲畫合鳴 Echo & Etch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700&family=Noto+Sans+SC:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ===== THEME SYSTEM ===== */
+:root {
+  --font-display: 'Noto Serif SC', 'Songti SC', 'STSong', serif;
+  --font-body: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  --scale: 1;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-pill: 999px;
+  --card-gap: 14px;
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.10);
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --duration: 0.35s;
+  --duration-slow: 0.6s;
+  /* Illustration palette - shared across SVG artwork */
+  --illus-gold: #F5D0A9;
+  --illus-sun: #FFD97D;
+  --illus-leaf: #6BAA60;
+  --illus-leaf-dark: #5B9E50;
+  --illus-meadow: #A8C98A;
+  --illus-skin: #D4915E;
+  --illus-fur: #C87A4A;
+  --illus-sky: #D8F0EA;
+  --illus-blush: #E8B4C8;
+  --illus-petal: #E8A0B0;
+  --illus-bark: #C4B8A8;
+  --illus-bark-dark: #A09484;
+  --illus-night: #2D1F3D;
+  --illus-night-deep: #1E1828;
+  --illus-building: #2D2640;
+  --illus-building-alt: #2A2338;
+  --illus-cream: #F5EDE0;
+  --illus-cream-dark: #E8DDD0;
+  --illus-parchment: #FFF5E6;
+  --illus-warm-surface: #E8E0D4;
+  --illus-sage: #8BAA7F;
+  --illus-dark-eye: #3E2A1A;
+  --illus-fur-dark: #C89A4A;
+}
+
+/* Adult (default) */
+[data-mode="adult"] {
+  --bg-primary: #1A1520;
+  --bg-secondary: #241E2E;
+  --bg-surface: rgba(255,255,255,0.06);
+  --bg-surface-solid: #2A2336;
+  --text-primary: #F2EDE6;
+  --text-secondary: #C4B8A8;
+  --text-muted: #8A7E72;
+  --accent: #C8956C;
+  --accent-glow: rgba(200,149,108,0.2);
+  --accent-soft: rgba(200,149,108,0.12);
+  --accent-hover: #D4A47C;
+  --border: rgba(255,255,255,0.08);
+  --input-bg: rgba(255,255,255,0.05);
+  --nav-bg: rgba(26,21,32,0.92);
+  --card-bg: rgba(255,255,255,0.04);
+  --glow-1: rgba(200,149,108,0.15);
+  --glow-2: rgba(139,92,168,0.12);
+  --splash-gradient: linear-gradient(160deg, #1A1520 0%, #2D1F3D 50%, #1A1520 100%);
+  --mode-icon-color: #C8956C;
+}
+
+/* Children */
+[data-mode="child"] {
+  --bg-primary: #FFF8F0;
+  --bg-secondary: #FFF1E0;
+  --bg-surface: #FFFFFF;
+  --bg-surface-solid: #FFFFFF;
+  --text-primary: #5C3D1E;
+  --text-secondary: #8B6E4E;
+  --text-muted: #B8A48E;
+  --accent: #E8845A;
+  --accent-glow: rgba(232,132,90,0.2);
+  --accent-soft: rgba(232,132,90,0.1);
+  --accent-hover: #F09068;
+  --border: rgba(92,61,30,0.1);
+  --input-bg: #FFF5EC;
+  --nav-bg: rgba(255,248,240,0.94);
+  --card-bg: #FFFFFF;
+  --glow-1: rgba(232,132,90,0.12);
+  --glow-2: rgba(139,195,74,0.1);
+  --splash-gradient: linear-gradient(160deg, #FFF8F0 0%, #FFE8D0 50%, #FFF8F0 100%);
+  --mode-icon-color: #E8845A;
+}
+
+/* Teen */
+[data-mode="teen"] {
+  --bg-primary: #F2FAF7;
+  --bg-secondary: #E8F5F0;
+  --bg-surface: #FFFFFF;
+  --bg-surface-solid: #FFFFFF;
+  --text-primary: #1E3D3A;
+  --text-secondary: #4A6B66;
+  --text-muted: #8AACA6;
+  --accent: #5CBFB3;
+  --accent-glow: rgba(92,191,179,0.2);
+  --accent-soft: rgba(92,191,179,0.1);
+  --accent-hover: #6DCBBD;
+  --border: rgba(30,61,58,0.1);
+  --input-bg: #F0F8F5;
+  --nav-bg: rgba(242,250,247,0.94);
+  --card-bg: #FFFFFF;
+  --glow-1: rgba(92,191,179,0.12);
+  --glow-2: rgba(232,180,200,0.1);
+  --splash-gradient: linear-gradient(160deg, #F2FAF7 0%, #D8F0EA 50%, #F2FAF7 100%);
+  --mode-icon-color: #5CBFB3;
+}
+
+/* Elderly */
+[data-mode="elderly"] {
+  --bg-primary: #FAF7F2;
+  --bg-secondary: #F0EBE2;
+  --bg-surface: #FFFFFF;
+  --bg-surface-solid: #FFFFFF;
+  --text-primary: #3E362C;
+  --text-secondary: #6B5E4E;
+  --text-muted: #A09484;
+  --accent: #5B9E8F;
+  --accent-glow: rgba(91,158,143,0.2);
+  --accent-soft: rgba(91,158,143,0.1);
+  --accent-hover: #6BAA9C;
+  --border: rgba(62,54,44,0.12);
+  --input-bg: #F5F0E8;
+  --nav-bg: rgba(250,247,242,0.94);
+  --card-bg: #FFFFFF;
+  --glow-1: rgba(91,158,143,0.12);
+  --glow-2: rgba(139,117,86,0.08);
+  --splash-gradient: linear-gradient(160deg, #FAF7F2 0%, #E8E0D4 50%, #FAF7F2 100%);
+  --mode-icon-color: #5B9E8F;
+  --scale: 1.15;
+}
+
+/* ===== RESET & BASE ===== */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { font-size: calc(16px * var(--scale)); }
+body {
+  font-family: var(--font-body);
+  font-weight: 400;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  line-height: 1.5;
+  overflow: hidden;
+  transition: background var(--duration) var(--ease), color var(--duration) var(--ease);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ===== LAYOUT ===== */
+.device-container {
+  width: 100%;
+  height: 100dvh;
+  max-width: 430px;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-primary);
+  transition: background var(--duration) var(--ease);
+}
+@media (min-width: 431px) {
+  body { background: #0E0B12; display: flex; align-items: center; justify-content: center; }
+  .device-container {
+    height: min(900px, 100dvh);
+    border-radius: 0;
+    box-shadow: 0 0 80px rgba(200,149,108,0.06);
+  }
+}
+
+/* ===== SCREENS ===== */
+.screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--duration) var(--ease), transform var(--duration) var(--ease);
+  transform: translateY(12px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+.screen.active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+  z-index: 10;
+}
+.screen::-webkit-scrollbar { display: none; }
+
+/* ===== SPLASH ===== */
+[data-component="Splash Screen"] {
+  align-items: center;
+  justify-content: center;
+  background: var(--splash-gradient);
+  gap: 24px;
+}
+.splash-logo {
+  animation: fadeUp 1.2s var(--ease) both;
+}
+.splash-logo svg { width: 120px; height: 120px; }
+.splash-brand {
+  text-align: center;
+  animation: fadeUp 1.2s var(--ease) 0.3s both;
+}
+.splash-brand h1 {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+.splash-brand p {
+  font-size: 13px;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  margin-top: 8px;
+  text-transform: uppercase;
+}
+.splash-tagline {
+  font-size: 14px;
+  color: var(--text-secondary);
+  animation: fadeUp 1.2s var(--ease) 0.6s both;
+  text-align: center;
+  max-width: 240px;
+  line-height: 1.6;
+}
+
+/* ===== MODE SELECT ===== */
+[data-component="Mode Select"] {
+  padding: 60px 20px 40px;
+  background: var(--bg-primary);
+}
+.mode-select-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+.mode-select-header h2 {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+.mode-select-header p {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-top: 8px;
+}
+.mode-cards { display: flex; flex-direction: column; gap: var(--card-gap); }
+.mode-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 20px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--duration) var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+.mode-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.mode-card:active { transform: translateY(0); }
+.mode-card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.mode-card-icon svg { width: 26px; height: 26px; }
+.mode-card-text h3 {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+.mode-card-text p {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 2px;
+  line-height: 1.5;
+}
+.mode-card-arrow {
+  margin-left: auto;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  transition: transform var(--duration) var(--ease);
+}
+.mode-card:hover .mode-card-arrow { transform: translateX(3px); }
+
+/* Mode card color dots */
+.mode-card[data-mode-val="child"] .mode-card-icon { background: rgba(232,132,90,0.12); color: var(--illus-fur); }
+.mode-card[data-mode-val="teen"] .mode-card-icon { background: rgba(92,191,179,0.12); color: var(--accent); }
+.mode-card[data-mode-val="adult"] .mode-card-icon { background: var(--accent-soft); color: var(--accent); }
+.mode-card[data-mode-val="elderly"] .mode-card-icon { background: rgba(91,158,143,0.12); color: var(--accent); }
+
+/* ===== HOME / INPUT ===== */
+[data-component="Home Input"] {
+  background: var(--bg-primary);
+}
+.home-header {
+  padding: 52px 20px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+.home-greeting h2 {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+.home-greeting p {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+.mode-switcher {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: all var(--duration) var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+.mode-switcher:hover { background: var(--accent-soft); }
+.mode-switcher-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  transition: background var(--duration) var(--ease);
+}
+.mode-switcher span {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.home-body {
+  flex: 1;
+  padding: 8px 20px 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+.home-body::-webkit-scrollbar { display: none; }
+
+/* Input Tabs */
+.input-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  flex-shrink: 0;
+  margin-bottom: 16px;
+}
+.input-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 8px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: calc(var(--radius-lg) - 4px);
+  cursor: pointer;
+  transition: all 0.25s var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+.input-tab svg { width: 16px; height: 16px; flex-shrink: 0; }
+.input-tab.active {
+  background: var(--bg-surface-solid);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-sm);
+}
+[data-mode="adult"] .input-tab.active { background: var(--bg-secondary); }
+.input-tab:hover:not(.active) { color: var(--text-secondary); }
+
+/* Input Panels */
+.input-panels {
+  flex: 1;
+  position: relative;
+  min-height: 200px;
+}
+.input-panel {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s var(--ease);
+  display: flex;
+  flex-direction: column;
+}
+.input-panel.active { opacity: 1; pointer-events: auto; }
+
+/* Text Input */
+.text-area-wrap {
+  flex: 1;
+  position: relative;
+}
+.text-area-wrap textarea {
+  width: 100%;
+  height: 100%;
+  min-height: 160px;
+  padding: 16px;
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  resize: none;
+  outline: none;
+  transition: border-color 0.25s var(--ease);
+}
+.text-area-wrap textarea::placeholder { color: var(--text-muted); }
+.text-area-wrap textarea:focus { border-color: var(--accent); }
+.text-hint {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 8px;
+  text-align: right;
+}
+
+/* Voice Input */
+.voice-panel { align-items: center; justify-content: center; gap: 24px; padding: 20px 0; }
+.voice-visual {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s var(--ease);
+}
+.voice-visual::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+  opacity: 0;
+  transition: all 0.3s var(--ease);
+}
+.voice-visual.recording::before {
+  opacity: 1;
+  animation: pulseRing 1.5s var(--ease) infinite;
+}
+.voice-visual svg { width: 36px; height: 36px; color: var(--accent); }
+.voice-status {
+  font-size: 15px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+.voice-waveform {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  height: 40px;
+  opacity: 0;
+  transition: opacity 0.3s var(--ease);
+}
+.voice-waveform.active { opacity: 1; }
+.voice-waveform .bar {
+  width: 3px;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: height 0.1s ease;
+}
+.voice-duration {
+  font-size: 28px;
+  font-weight: 300;
+  color: var(--text-primary);
+  letter-spacing: 0.05em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Photo Input */
+.photo-panel { gap: 16px; padding: 8px 0; }
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.photo-item {
+  aspect-ratio: 1;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s var(--ease);
+  position: relative;
+}
+.photo-item:hover { transform: scale(0.97); }
+.photo-item svg { width: 100%; height: 100%; }
+.photo-add {
+  aspect-ratio: 1;
+  border-radius: var(--radius-md);
+  border: 2px dashed var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.25s var(--ease);
+  color: var(--text-muted);
+}
+.photo-add:hover { border-color: var(--accent); color: var(--accent); }
+.photo-add svg { width: 28px; height: 28px; }
+.photo-add span { font-size: 12px; }
+
+/* Doodle Input */
+.doodle-panel { gap: 12px; }
+.doodle-canvas-wrap {
+  flex: 1;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--input-bg);
+  position: relative;
+}
+.doodle-canvas-wrap canvas {
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
+}
+.doodle-tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.doodle-color {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s var(--ease);
+}
+.doodle-color.active { border-color: var(--text-primary); transform: scale(1.15); }
+.doodle-clear {
+  margin-left: auto;
+  padding: 6px 14px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition: all 0.2s var(--ease);
+}
+.doodle-clear:hover { background: var(--accent-soft); color: var(--accent); }
+.doodle-size {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+.doodle-size-dot {
+  border-radius: 50%;
+  background: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s var(--ease);
+}
+.doodle-size-dot.active { background: var(--text-primary); }
+
+/* Generate Button */
+.generate-bar {
+  padding: 16px 20px;
+  padding-bottom: 90px;
+  flex-shrink: 0;
+}
+.generate-btn {
+  width: 100%;
+  padding: 16px;
+  background: var(--accent);
+  color: #FFFFFF;
+  border: none;
+  border-radius: var(--radius-lg);
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: all 0.25s var(--ease);
+  box-shadow: 0 4px 16px var(--accent-glow);
+  -webkit-tap-highlight-color: transparent;
+}
+.generate-btn:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 6px 24px var(--accent-glow); }
+.generate-btn:active { transform: translateY(1px); box-shadow: 0 2px 8px var(--accent-glow); }
+
+/* ===== GENERATING ===== */
+[data-component="AI Generating"] {
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-primary);
+  gap: 0;
+  padding: 40px 32px;
+}
+.gen-phase {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.8s var(--ease);
+  padding: 40px 32px;
+}
+.gen-phase.active { opacity: 1; }
+
+/* Phase 1: Ink drop */
+.ink-drop {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--accent);
+  position: relative;
+}
+.ink-drop::before, .ink-drop::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+}
+.ink-drop.expanding { animation: inkExpand 2s var(--ease-out) forwards; }
+.ink-drop.expanding::before { animation: inkRing 2s var(--ease-out) 0.3s forwards; }
+.ink-drop.expanding::after { animation: inkRing 2s var(--ease-out) 0.6s forwards; }
+
+.gen-label {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-top: 24px;
+  letter-spacing: 0.05em;
+}
+
+/* Phase 2: Text typewriter */
+.gen-narrative {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.8;
+  text-align: center;
+  letter-spacing: -0.01em;
+  max-width: 320px;
+}
+.gen-narrative .char {
+  opacity: 0;
+  animation: charAppear 0.08s var(--ease) forwards;
+}
+
+/* Phase 3: Waveform */
+.gen-waveform-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  height: 60px;
+  width: 280px;
+}
+.gen-waveform-wrap .bar {
+  width: 3px;
+  background: var(--accent);
+  border-radius: 2px;
+  animation: waveBar 0.8s var(--ease) infinite alternate;
+}
+.gen-audio-label {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 16px;
+}
+
+/* Phase 4: Image reveal */
+.gen-image-reveal {
+  width: 280px;
+  height: 200px;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  animation: imageReveal 1.5s var(--ease) forwards;
+}
+.gen-image-reveal svg { width: 100%; height: 100%; }
+
+/* ===== ECHO CARD ===== */
+[data-component="Echo Card"] {
+  background: var(--bg-primary);
+}
+.echo-card-view {
+  flex: 1;
+  padding: 20px;
+  padding-top: 52px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.echo-card-hero {
+  width: 100%;
+  aspect-ratio: 4/3;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  position: relative;
+}
+.echo-card-hero svg { width: 100%; height: 100%; }
+.echo-card-hero .overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20px;
+  background: linear-gradient(transparent, rgba(0,0,0,0.5));
+}
+.echo-card-date {
+  font-size: 12px;
+  color: rgba(255,255,255,0.7);
+  letter-spacing: 0.02em;
+}
+.echo-card-title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+  color: #FFFFFF;
+  letter-spacing: -0.01em;
+  margin-top: 4px;
+  line-height: 1.3;
+}
+
+/* Audio Player */
+.echo-player {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+[data-mode="adult"] .echo-player { background: var(--bg-secondary); }
+.player-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.player-play-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #FFFFFF;
+  flex-shrink: 0;
+  transition: all 0.2s var(--ease);
+}
+.player-play-btn:hover { background: var(--accent-hover); transform: scale(1.05); }
+.player-play-btn svg { width: 18px; height: 18px; }
+.player-info {
+  flex: 1;
+  min-width: 0;
+}
+.player-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.player-duration {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  margin-top: 2px;
+}
+.player-wave {
+  display: flex;
+  align-items: center;
+  gap: 1.5px;
+  height: 32px;
+}
+.player-wave .bar {
+  width: 2.5px;
+  background: var(--accent);
+  border-radius: 2px;
+  opacity: 0.4;
+  transition: opacity 0.15s ease, height 0.15s ease;
+}
+.player-wave .bar.played { opacity: 1; }
+.player-progress {
+  height: 3px;
+  background: var(--border);
+  border-radius: 2px;
+  position: relative;
+  cursor: pointer;
+}
+.player-progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  width: 0%;
+  transition: width 0.3s linear;
+}
+.player-time {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Narrative Text */
+.echo-narrative {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+}
+[data-mode="adult"] .echo-narrative { background: var(--bg-secondary); }
+.echo-narrative p {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.8;
+  letter-spacing: -0.01em;
+}
+.echo-narrative .meta {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+.echo-tag {
+  padding: 4px 10px;
+  background: var(--accent-soft);
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+/* Action Bar */
+.echo-actions {
+  display: flex;
+  gap: 10px;
+  padding-bottom: 100px;
+}
+.echo-action {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+[data-mode="adult"] .echo-action { background: var(--bg-secondary); }
+.echo-action:hover { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); }
+.echo-action svg { width: 16px; height: 16px; }
+.echo-action.primary {
+  background: var(--accent);
+  color: #FFFFFF;
+  border-color: var(--accent);
+}
+.echo-action.primary:hover { background: var(--accent-hover); }
+
+/* ===== MY ECHOES ===== */
+[data-component="My Echoes"] {
+  background: var(--bg-primary);
+}
+.myechoes-header {
+  padding: 52px 20px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+.myechoes-header h2 {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+.myechoes-filter {
+  display: flex;
+  gap: 6px;
+  padding: 12px 20px;
+  flex-shrink: 0;
+  overflow-x: auto;
+}
+.myechoes-filter::-webkit-scrollbar { display: none; }
+.filter-chip {
+  padding: 6px 14px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+.filter-chip.active {
+  background: var(--accent);
+  color: #FFFFFF;
+  border-color: var(--accent);
+}
+.filter-chip:hover:not(.active) { border-color: var(--accent); color: var(--accent); }
+
+.myechoes-list {
+  flex: 1;
+  padding: 0 20px 100px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--card-gap);
+  overflow-y: auto;
+}
+.myechoes-list::-webkit-scrollbar { display: none; }
+.echo-item {
+  display: flex;
+  gap: 14px;
+  padding: 14px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all 0.2s var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+[data-mode="adult"] .echo-item { background: var(--bg-secondary); }
+.echo-item:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.echo-item-thumb {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.echo-item-thumb svg { width: 100%; height: 100%; }
+.echo-item-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.echo-item-title {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.echo-item-excerpt {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 4px;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.echo-item-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* ===== SETTINGS ===== */
+[data-component="Settings"] {
+  background: var(--bg-primary);
+}
+.settings-header {
+  padding: 52px 20px 16px;
+  flex-shrink: 0;
+}
+.settings-header h2 {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+.settings-body {
+  flex: 1;
+  padding: 16px 20px 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.settings-group {
+  padding: 8px 0;
+}
+.settings-group-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  padding: 0 4px 8px;
+  text-transform: uppercase;
+}
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: var(--card-bg);
+  border-radius: var(--radius-md);
+  margin-bottom: 2px;
+  cursor: pointer;
+  transition: background 0.2s var(--ease);
+}
+[data-mode="adult"] .settings-row { background: var(--bg-secondary); }
+.settings-row:hover { background: var(--accent-soft); }
+.settings-row:first-of-type { border-radius: var(--radius-md) var(--radius-md) 2px 2px; }
+.settings-row:last-of-type { border-radius: 2px 2px var(--radius-md) var(--radius-md); margin-bottom: 0; }
+.settings-row:only-of-type { border-radius: var(--radius-md); }
+.settings-row-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.settings-row-left svg { width: 20px; height: 20px; color: var(--text-muted); }
+.settings-row-left span { font-size: 15px; color: var(--text-primary); font-weight: 400; }
+.settings-row-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+.settings-row-right svg { width: 16px; height: 16px; }
+
+/* Toggle switch */
+.toggle {
+  width: 44px;
+  height: 24px;
+  background: var(--border);
+  border-radius: 12px;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.25s var(--ease);
+}
+.toggle.on { background: var(--accent); }
+.toggle::after {
+  content: '';
+  width: 20px;
+  height: 20px;
+  background: #FFFFFF;
+  border-radius: 50%;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.25s var(--ease);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+.toggle.on::after { transform: translateX(20px); }
+
+/* ===== BOTTOM NAV ===== */
+.bottom-nav {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 72px;
+  background: var(--nav-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 16px;
+  padding-bottom: 8px;
+  z-index: 100;
+  transition: background var(--duration) var(--ease), border-color var(--duration) var(--ease);
+}
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 16px;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: color 0.2s var(--ease);
+  -webkit-tap-highlight-color: transparent;
+  border: none;
+  background: none;
+  font-family: var(--font-body);
+}
+.nav-item svg { width: 22px; height: 22px; }
+.nav-item span { font-size: 11px; font-weight: 500; }
+.nav-item.active { color: var(--accent); }
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes pulseRing {
+  0% { transform: scale(1); opacity: 0.6; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+@keyframes inkExpand {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(15); opacity: 0.15; }
+}
+@keyframes inkRing {
+  0% { transform: scale(1); opacity: 0.5; }
+  100% { transform: scale(20); opacity: 0; }
+}
+@keyframes charAppear {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes waveBar {
+  from { height: 6px; }
+  to { height: var(--h, 20px); }
+}
+@keyframes imageReveal {
+  0% { opacity: 0; transform: scale(1.05); filter: blur(8px); }
+  100% { opacity: 1; transform: scale(1); filter: blur(0); }
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes breathe {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-height: 700px) {
+  .home-header { padding-top: 36px; }
+  .myechoes-header { padding-top: 36px; }
+  .settings-header { padding-top: 36px; }
+  .echo-card-view { padding-top: 36px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+</style>
+</head>
+<body>
+<div class="device-container">
+<main>
+
+  <!-- ===== SPLASH ===== -->
+  <div class="screen active" id="splash" data-component="Splash Screen">
+    <div class="splash-logo">
+      <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="60" cy="60" r="56" stroke="currentColor" stroke-width="1" opacity="0.15"/>
+        <circle cx="60" cy="60" r="42" stroke="currentColor" stroke-width="1" opacity="0.1"/>
+        <path d="M60 28 C48 40, 36 50, 36 64 C36 78, 46 88, 60 88 C74 88, 84 78, 84 64 C84 50, 72 40, 60 28Z" fill="currentColor" opacity="0.08"/>
+        <path d="M52 50 Q52 42, 60 38 Q68 42, 68 50 L68 72 Q68 76, 64 78 L56 78 Q52 76, 52 72Z" fill="none" stroke="var(--accent)" stroke-width="1.5" opacity="0.6"/>
+        <path d="M48 58 L48 66 M72 58 L72 66" stroke="var(--accent)" stroke-width="1" stroke-linecap="round" opacity="0.4"/>
+        <circle cx="60" cy="60" r="3" fill="var(--accent)" opacity="0.6"/>
+        <path d="M40 44 Q50 36, 60 38" stroke="var(--accent)" stroke-width="1" stroke-linecap="round" opacity="0.3"/>
+        <path d="M80 44 Q70 36, 60 38" stroke="var(--accent)" stroke-width="1" stroke-linecap="round" opacity="0.3"/>
+        <path d="M38 70 Q48 80, 60 82 Q72 80, 82 70" stroke="var(--accent)" stroke-width="1" stroke-linecap="round" opacity="0.3"/>
+      </svg>
+    </div>
+    <div class="splash-brand">
+      <h1>聲畫合鳴</h1>
+      <p>Echo & Etch</p>
+    </div>
+    <p class="splash-tagline">将无声的痕迹，化为内心的回响</p>
+  </div>
+
+  <!-- ===== MODE SELECT ===== -->
+  <div class="screen" id="modeSelect" data-component="Mode Select">
+    <div class="mode-select-header">
+      <h2>选择你的模式</h2>
+      <p>找到最贴合当下心境的声音</p>
+    </div>
+    <div class="mode-cards">
+      <div class="mode-card" data-mode-val="child" data-component="Mode Card">
+        <div class="mode-card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M12 13c-4 0-7 2-7 4v1h14v-1c0-2-3-4-7-4z"/><path d="M8 6c0-1 .5-2 1.5-2.5M16 6c0-1-.5-2-1.5-2.5"/></svg>
+        </div>
+        <div class="mode-card-text">
+          <h3>童趣模式</h3>
+          <p>温暖故事陪伴，启蒙感知成长</p>
+        </div>
+        <svg class="mode-card-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg>
+      </div>
+      <div class="mode-card" data-mode-val="teen" data-component="Mode Card">
+        <div class="mode-card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18"/><circle cx="12" cy="12" r="3"/><path d="M12 3a9 9 0 019 9"/><path d="M12 21a9 9 0 01-9-9"/></svg>
+        </div>
+        <div class="mode-card-text">
+          <h3>青春模式</h3>
+          <p>创意表达，情绪宣泄，成长记录</p>
+        </div>
+        <svg class="mode-card-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg>
+      </div>
+      <div class="mode-card" data-mode-val="adult" data-component="Mode Card">
+        <div class="mode-card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+        </div>
+        <div class="mode-card-text">
+          <h3>深夜疗愈</h3>
+          <p>细腻叙事，专属陪伴，内心复盘</p>
+        </div>
+        <svg class="mode-card-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg>
+      </div>
+      <div class="mode-card" data-mode-val="elderly" data-component="Mode Card">
+        <div class="mode-card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        </div>
+        <div class="mode-card-text">
+          <h3>舒心陪伴</h3>
+          <p>简洁温和，零门槛操作，静心康养</p>
+        </div>
+        <svg class="mode-card-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== HOME / INPUT ===== -->
+  <div class="screen" id="home" data-component="Home Input">
+    <div class="home-header">
+      <div class="home-greeting">
+        <h2 id="greetingText">今晚想记录什么</h2>
+        <p id="greetingSub">随手一笔，听见内心回响</p>
+      </div>
+      <button class="mode-switcher" id="modeSwitchBtn" aria-label="切换模式">
+        <span class="mode-switcher-dot"></span>
+        <span id="modeLabel">深夜疗愈</span>
+      </button>
+    </div>
+
+    <div class="home-body">
+      <div class="input-tabs" data-component="Input Tabs">
+        <button class="input-tab active" data-tab="text" aria-label="文字输入">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 3h12M2 7h8M2 11h10"/></svg>
+          文字
+        </button>
+        <button class="input-tab" data-tab="voice" aria-label="语音输入">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="5" y="1" width="6" height="9" rx="3"/><path d="M3 7a5 5 0 0010 0M8 12v3"/></svg>
+          语音
+        </button>
+        <button class="input-tab" data-tab="photo" aria-label="拍照输入">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="1" y="3" width="14" height="11" rx="2"/><circle cx="8" cy="9" r="3"/><path d="M5 3l1-2h4l1 2"/></svg>
+          拍照
+        </button>
+        <button class="input-tab" data-tab="doodle" aria-label="涂鸦输入">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M11.5 1.5l3 3-9 9H2.5v-3l9-9z"/><path d="M9.5 3.5l3 3"/></svg>
+          涂鸦
+        </button>
+      </div>
+
+      <div class="input-panels">
+        <!-- Text Panel -->
+        <div class="input-panel active" id="panelText" data-component="Text Input Panel">
+          <div class="text-area-wrap">
+            <textarea id="textInput" placeholder="写下此刻的心情、想法、或随手记录的一段文字..." aria-label="文字输入区域"></textarea>
+          </div>
+          <p class="text-hint">轻触输入，AI 将为你编织专属叙事</p>
+        </div>
+
+        <!-- Voice Panel -->
+        <div class="input-panel" id="panelVoice" data-component="Voice Input Panel">
+          <div class="voice-panel">
+            <div class="voice-visual" id="voiceBtn" aria-label="开始录音">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="7" y="1" width="10" height="14" rx="5"/><path d="M4 10a8 8 0 0016 0M12 18v4M8 22h8"/></svg>
+            </div>
+            <div class="voice-waveform" id="voiceWaveform">
+              <!-- bars generated by JS -->
+            </div>
+            <p class="voice-status" id="voiceStatus">轻触开始录音</p>
+            <p class="voice-duration" id="voiceDuration">00:00</p>
+          </div>
+        </div>
+
+        <!-- Photo Panel -->
+        <div class="input-panel" id="panelPhoto" data-component="Photo Input Panel">
+          <div class="photo-panel">
+            <div class="photo-grid" id="photoGrid">
+              <div class="photo-item">
+                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="100" height="100" fill="var(--illus-cream-dark)"/>
+                  <circle cx="70" cy="30" r="12" fill="var(--illus-gold)" opacity="0.8"/>
+                  <path d="M0 70 Q25 45, 50 60 T100 50 L100 100 L0 100Z" fill="var(--illus-sage)" opacity="0.6"/>
+                  <path d="M0 80 Q30 55, 60 70 T100 65 L100 100 L0 100Z" fill="var(--illus-leaf)" opacity="0.7"/>
+                </svg>
+              </div>
+              <div class="photo-item">
+                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="100" height="100" fill="var(--illus-night)"/>
+                  <circle cx="50" cy="50" r="16" fill="var(--illus-gold)" opacity="0.9"/>
+                  <rect x="30" y="70" width="40" height="30" rx="3" fill="var(--illus-building-alt)" opacity="0.6"/>
+                  <rect x="20" y="75" width="15" height="25" rx="2" fill="var(--illus-night)" opacity="0.5"/>
+                  <circle cx="50" cy="50" r="4" fill="#FFFFFF" opacity="0.5"/>
+                </svg>
+              </div>
+              <div class="photo-item">
+                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="100" height="100" fill="var(--illus-cream)"/>
+                  <path d="M20 80 Q35 40, 50 55 T80 30" stroke="var(--accent)" stroke-width="2" fill="none" opacity="0.5"/>
+                  <circle cx="30" cy="60" r="8" fill="var(--illus-fur)" opacity="0.3"/>
+                  <circle cx="65" cy="40" r="6" fill="var(--illus-sky)" opacity="0.3"/>
+                  <circle cx="50" cy="70" r="4" fill="var(--accent)" opacity="0.4"/>
+                </svg>
+              </div>
+              <div class="photo-add" id="photoAddBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/><rect x="3" y="3" width="18" height="18" rx="3"/></svg>
+                <span>添加照片</span>
+              </div>
+            </div>
+            <p class="text-hint">选择或拍摄一张照片，AI 将感受画面意境</p>
+          </div>
+        </div>
+
+        <!-- Doodle Panel -->
+        <div class="input-panel" id="panelDoodle" data-component="Doodle Input Panel">
+          <div class="doodle-panel">
+            <div class="doodle-canvas-wrap">
+              <canvas id="doodleCanvas" width="600" height="400"></canvas>
+            </div>
+            <div class="doodle-tools">
+              <div class="doodle-color active" style="background:#C8956C" data-color="#C8956C"></div>
+              <div class="doodle-color" style="background:#5B9E8F" data-color="#5B9E8F"></div>
+              <div class="doodle-color" style="background:#8B6B8A" data-color="#8B6B8A"></div>
+              <div class="doodle-color" style="background:#E8845A" data-color="#E8845A"></div>
+              <div class="doodle-color" style="background:#4A6B66" data-color="#4A6B66"></div>
+              <div class="doodle-size">
+                <div class="doodle-size-dot" style="width:6px;height:6px" data-size="2"></div>
+                <div class="doodle-size-dot active" style="width:10px;height:10px" data-size="4"></div>
+                <div class="doodle-size-dot" style="width:14px;height:14px" data-size="8"></div>
+              </div>
+              <button class="doodle-clear" id="doodleClearBtn">清除</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="generate-bar">
+      <button class="generate-btn" id="generateBtn">合鸣 — 生成我的回声</button>
+    </div>
+  </div>
+
+  <!-- ===== GENERATING ===== -->
+  <div class="screen" id="generating" data-component="AI Generating">
+    <div class="gen-phase active" id="genPhase1">
+      <div class="ink-drop expanding"></div>
+      <p class="gen-label">正在感受你的痕迹...</p>
+    </div>
+    <div class="gen-phase" id="genPhase2">
+      <p class="gen-narrative" id="genNarrative"></p>
+      <p class="gen-label">正在编织叙事...</p>
+    </div>
+    <div class="gen-phase" id="genPhase3">
+      <div class="gen-waveform-wrap" id="genWaveform"></div>
+      <p class="gen-audio-label">正在合成专属音频...</p>
+    </div>
+    <div class="gen-phase" id="genPhase4">
+      <div class="gen-image-reveal" id="genImageReveal"></div>
+      <p class="gen-label">意境画面生成中...</p>
+    </div>
+  </div>
+
+  <!-- ===== ECHO CARD ===== -->
+  <div class="screen" id="echoCard" data-component="Echo Card">
+    <div class="echo-card-view">
+      <div class="echo-card-hero" id="echoHero">
+        <!-- SVG injected by JS -->
+        <div class="overlay">
+          <p class="echo-card-date" id="echoDate">2026年8月1日 夜晚</p>
+          <h2 class="echo-card-title" id="echoTitle">城市暮色中的自我对话</h2>
+        </div>
+      </div>
+
+      <div class="echo-player" data-component="Audio Player">
+        <div class="player-top">
+          <button class="player-play-btn" id="playerPlayBtn" aria-label="播放">
+            <svg viewBox="0 0 18 18" fill="currentColor"><path d="M4 2l12 7-12 7V2z"/></svg>
+          </button>
+          <div class="player-info">
+            <p class="player-title">专属冥想 · 城市暮色</p>
+            <p class="player-duration">02:34</p>
+          </div>
+        </div>
+        <div class="player-wave" id="playerWave"></div>
+        <div class="player-progress" id="playerProgress">
+          <div class="player-progress-fill" id="playerProgressFill"></div>
+        </div>
+        <div class="player-time">
+          <span id="playerCurrentTime">00:00</span>
+          <span>02:34</span>
+        </div>
+      </div>
+
+      <div class="echo-narrative">
+        <p id="narrativeText">今天的你在城市的喧嚣中停下了脚步，窗外的暮色正缓缓铺开。远处高楼的轮廓在橘粉色的天际线中渐渐模糊，像是生活给你按下了一次轻柔的暂停键。那些来不及说出口的心事，在这个黄昏有了落脚的地方。你不需要追赶什么，也不需要证明什么。这一刻的安静，是你给自己最温柔的礼物。</p>
+        <div class="meta">
+          <span class="echo-tag" id="echoModeTag">深夜疗愈</span>
+          <span class="echo-tag">文字输入</span>
+        </div>
+      </div>
+
+      <div class="echo-actions">
+        <button class="echo-action" aria-label="归档">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 4h12v10H2z"/><path d="M2 4l2-2h8l2 2"/><path d="M6 8h4"/></svg>
+          归档
+        </button>
+        <button class="echo-action" aria-label="分享">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="4" r="2"/><circle cx="4" cy="8" r="2"/><circle cx="12" cy="12" r="2"/><path d="M6 7l4-2M6 9l4 2"/></svg>
+          分享
+        </button>
+        <button class="echo-action primary" id="saveEchoBtn" aria-label="保存">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M8 1v10M4 7l4 4 4-4"/><path d="M2 12v2h12v-2"/></svg>
+          保存
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MY ECHOES ===== -->
+  <div class="screen" id="myEchoes" data-component="My Echoes">
+    <div class="myechoes-header">
+      <h2>我的回声</h2>
+    </div>
+    <div class="myechoes-filter">
+      <button class="filter-chip active" data-filter="all">全部</button>
+      <button class="filter-chip" data-filter="child">童趣</button>
+      <button class="filter-chip" data-filter="teen">青春</button>
+      <button class="filter-chip" data-filter="adult">深夜疗愈</button>
+      <button class="filter-chip" data-filter="elderly">舒心</button>
+    </div>
+    <div class="myechoes-list" id="echoesList">
+      <!-- Populated by JS -->
+    </div>
+  </div>
+
+  <!-- ===== SETTINGS ===== -->
+  <div class="screen" id="settings" data-component="Settings">
+    <div class="settings-header">
+      <h2>设置</h2>
+    </div>
+    <div class="settings-body">
+      <div class="settings-group">
+        <p class="settings-group-label">模式</p>
+        <div class="settings-row" id="settingsModeRow">
+          <div class="settings-row-left">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="10" cy="10" r="8"/><path d="M10 6v4l3 2"/></svg>
+            <span>当前模式</span>
+          </div>
+          <div class="settings-row-right">
+            <span id="settingsModeName">深夜疗愈</span>
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg>
+          </div>
+        </div>
+      </div>
+      <div class="settings-group">
+        <p class="settings-group-label">偏好</p>
+        <div class="settings-row">
+          <div class="settings-row-left">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M10 2a8 8 0 100 16 8 8 0 000-16z"/><path d="M10 6v4l3 2"/></svg>
+            <span>自动生成音频</span>
+          </div>
+          <div class="settings-row-right">
+            <div class="toggle on" id="toggleAutoAudio"></div>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div class="settings-row-left">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="3" width="14" height="14" rx="3"/><path d="M7 7h6M7 10h4M7 13h5"/></svg>
+            <span>叙事风格</span>
+          </div>
+          <div class="settings-row-right">
+            <span>冥想式</span>
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div class="settings-row-left">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="10" cy="10" r="4"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.93 4.93l1.41 1.41M13.66 13.66l1.41 1.41M4.93 15.07l1.41-1.41M13.66 6.34l1.41-1.41"/></svg>
+            <span>深色模式</span>
+          </div>
+          <div class="settings-row-right">
+            <div class="toggle" id="toggleDarkMode"></div>
+          </div>
+        </div>
+      </div>
+      <div class="settings-group">
+        <p class="settings-group-label">关于</p>
+        <div class="settings-row">
+          <div class="settings-row-left">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="10" cy="10" r="8"/><path d="M10 14v-4M10 6h0"/></svg>
+            <span>关于聲畫合鳴</span>
+          </div>
+          <div class="settings-row-right">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+  <!-- ===== BOTTOM NAV ===== -->
+  <nav class="bottom-nav" id="bottomNav" data-component="Bottom Navigation">
+    <button class="nav-item active" data-screen="home" aria-label="首页">
+      <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l8-6 8 6v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path d="M9 20V12h4v8"/></svg>
+      <span>首页</span>
+    </button>
+    <button class="nav-item" data-screen="myEchoes" aria-label="我的回声">
+      <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V4a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+      <span>我的回声</span>
+    </button>
+    <button class="nav-item" data-screen="settings" aria-label="设置">
+      <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="3"/><path d="M19.4 13.6a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V20a2 2 0 01-4 0v-.09A1.65 1.65 0 008.92 18.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.6 13.92a1.65 1.65 0 00-1.51-1H2.5a2 2 0 010-4h.09A1.65 1.65 0 004.1 7.88a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V2a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9c.36.14.68.37.93.66.25.3.42.65.5 1.03"/></svg>
+      <span>设置</span>
+    </button>
+  </nav>
+
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  // ===== STATE =====
+  let currentMode = 'adult';
+  let currentScreen = 'splash';
+  let currentTab = 'text';
+  let isRecording = false;
+  let recordTimer = null;
+  let recordSeconds = 0;
+  let isPlaying = false;
+  let playTimer = null;
+  let playProgress = 0;
+  let audioElement = null;
+  let currentAudioUrl = null;
+  let currentTheme = '';
+  let currentEchoId = null;
+  const API_BASE = '';
+
+  const modeNames = { child: '童趣模式', teen: '青春模式', adult: '深夜疗愈', elderly: '舒心陪伴' };
+  const greetings = {
+    child: { h: '今天想画什么故事呀', s: '随手画一画，听一个好故事' },
+    teen: { h: '嗨，今天有什么想说的', s: '记录一下，留住今天的自己' },
+    adult: { h: '今晚想记录什么', s: '随手一笔，听见内心回响' },
+    elderly: { h: '今天想记点什么', s: '慢慢来，不着急' }
+  };
+
+  const narratives = {
+    adult: '今天的你在城市的喧嚣中停下了脚步，窗外的暮色正缓缓铺开。远处高楼的轮廓在橘粉色的天际线中渐渐模糊，像是生活给你按下了一次轻柔的暂停键。那些来不及说出口的心事，在这个黄昏有了落脚的地方。你不需要追赶什么，也不需要证明什么。这一刻的安静，是你给自己最温柔的礼物。',
+    child: '在一片铺满金色落叶的小路上，有一只小松鼠正在收集松果。它圆圆的大眼睛闪着好奇的光，尾巴毛茸茸地翘起来。今天它发现了一颗特别大的松果，比它的小爪子还要大呢！小松鼠高兴地把松果抱在怀里，一步一步蹦回了树洞里的家。晚安，小松鼠，明天还有更多冒险等着你。',
+    teen: '午后的阳光透过教室的窗户洒在课桌上，你在课本的边角画了一个小小的星球。那个星球上没有考试，没有排名，只有软绵绵的云和会唱歌的风。你把耳机里的歌调到最大声，感觉自己就是那个星球上唯一的居民。其实偶尔躲一躲也没关系，等你准备好了，再回到这个吵闹又可爱的世界。',
+    elderly: '早晨推开窗，院子里的桂花又开了。那股清甜的香味啊，跟几十年前老家的味道一模一样。老伴儿在厨房煮粥，锅里咕嘟咕嘟的声音，听起来比什么音乐都让人安心。阳光慢慢爬上了阳台的藤椅，你坐下来，泡了一杯茶。日子就是这么慢慢过的，慢慢地，就很好了。'
+  };
+
+  const echoCards = [
+    { mode: 'adult', title: '城市暮色中的自我对话', excerpt: '今天的你在城市的喧嚣中停下了脚步...', date: '2026年8月1日', input: '文字', time: '21:34' },
+    { mode: 'adult', title: '凌晨三点的灵感碎片', excerpt: '忽然想起那个没有说完的故事...', date: '2026年7月30日', input: '文字', time: '03:12' },
+    { mode: 'teen', title: '午后课桌上的小星球', excerpt: '午后的阳光透过教室的窗户洒在课桌上...', date: '2026年7月28日', input: '涂鸦', time: '14:20' },
+    { mode: 'child', title: '小松鼠的金色松果', excerpt: '在一片铺满金色落叶的小路上...', date: '2026年7月25日', input: '语音', time: '20:00' },
+    { mode: 'elderly', title: '桂花香里的慢时光', excerpt: '早晨推开窗，院子里的桂花又开了...', date: '2026年7月22日', input: '语音', time: '07:45' },
+    { mode: 'adult', title: '雨天咖啡馆的窗边', excerpt: '雨滴沿着玻璃窗缓缓滑落...', date: '2026年7月20日', input: '拍照', time: '16:08' },
+  ];
+
+  // SVG generators for echo card hero images
+  const heroSVGs = {
+    adult: `<svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="sky-a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--illus-night)"/><stop offset="1" stop-color="var(--bg-primary)"/></linearGradient></defs>
+      <rect width="400" height="300" fill="url(#sky-a)"/>
+      <circle cx="320" cy="60" r="30" fill="var(--illus-gold)" opacity="0.15"/>
+      <circle cx="320" cy="60" r="20" fill="var(--illus-gold)" opacity="0.25"/>
+      <circle cx="80" cy="40" r="1.5" fill="var(--illus-gold)" opacity="0.6"/><circle cx="150" cy="25" r="1" fill="var(--illus-gold)" opacity="0.5"/>
+      <circle cx="220" cy="50" r="1.2" fill="var(--illus-gold)" opacity="0.4"/><circle cx="350" cy="35" r="1" fill="var(--illus-gold)" opacity="0.3"/>
+      <circle cx="50" cy="70" r="0.8" fill="var(--illus-gold)" opacity="0.5"/><circle cx="280" cy="20" r="1.5" fill="var(--illus-gold)" opacity="0.35"/>
+      <path d="M0 200 Q50 170,100 190 T200 175 T300 185 T400 170 L400 300 L0 300Z" fill="var(--bg-secondary)" opacity="0.8"/>
+      <path d="M0 220 Q60 200,120 215 T240 200 T360 210 L400 205 L400 300 L0 300Z" fill="var(--illus-night-deep)"/>
+      <rect x="100" y="160" width="20" height="60" rx="2" fill="var(--illus-building)" opacity="0.7"/><rect x="104" y="165" width="4" height="4" fill="var(--illus-gold)" opacity="0.3"/><rect x="112" y="175" width="4" height="4" fill="var(--illus-gold)" opacity="0.2"/>
+      <rect x="160" y="140" width="30" height="80" rx="2" fill="var(--illus-building-alt)" opacity="0.7"/><rect x="165" y="148" width="4" height="4" fill="var(--illus-gold)" opacity="0.25"/><rect x="175" y="158" width="4" height="4" fill="var(--illus-gold)" opacity="0.2"/>
+      <rect x="260" y="150" width="25" height="70" rx="2" fill="var(--illus-building)" opacity="0.6"/><rect x="265" y="158" width="3" height="3" fill="var(--illus-gold)" opacity="0.2"/>
+      <path d="M0 250 Q100 235,200 245 T400 240 L400 300 L0 300Z" fill="var(--accent)" opacity="0.06"/>
+    </svg>`,
+    child: `<svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+      <rect width="400" height="300" fill="var(--illus-parchment)"/>
+      <circle cx="320" cy="60" r="40" fill="var(--illus-sun)" opacity="0.4"/>
+      <path d="M50 280 Q60 250,70 260 T90 240 L95 280Z" fill="var(--illus-leaf)" opacity="0.5"/>
+      <path d="M120 280 Q130 240,140 255 T160 230 L165 280Z" fill="var(--illus-leaf-dark)" opacity="0.6"/>
+      <path d="M300 280 Q310 250,320 260 T340 235 L345 280Z" fill="var(--illus-leaf)" opacity="0.5"/>
+      <ellipse cx="200" cy="260" rx="120" ry="30" fill="var(--illus-fur-dark)" opacity="0.3"/>
+      <path d="M0 260 Q50 240,100 255 T200 240 T300 250 T400 238 L400 300 L0 300Z" fill="var(--illus-meadow)" opacity="0.4"/>
+      <circle cx="180" cy="200" r="20" fill="var(--illus-fur)" opacity="0.7"/>
+      <circle cx="180" cy="185" r="12" fill="var(--illus-skin)" opacity="0.8"/>
+      <circle cx="176" cy="182" r="2" fill="var(--illus-dark-eye)"/><circle cx="184" cy="182" r="2" fill="var(--illus-dark-eye)"/>
+      <path d="M175 187 Q180 190,185 187" stroke="var(--illus-dark-eye)" stroke-width="1" fill="none" stroke-linecap="round"/>
+      <path d="M180 205 L180 220 M175 215 L180 220 L185 215" stroke="var(--illus-fur)" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <ellipse cx="210" cy="230" rx="15" ry="10" fill="var(--illus-fur-dark)" opacity="0.6"/>
+    </svg>`,
+    teen: `<svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="sky-t" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--illus-sky)"/><stop offset="1" stop-color="var(--bg-primary)"/></linearGradient></defs>
+      <rect width="400" height="300" fill="url(#sky-t)"/>
+      <circle cx="100" cy="80" r="60" fill="var(--accent)" opacity="0.08"/>
+      <circle cx="300" cy="60" r="80" fill="var(--illus-blush)" opacity="0.08"/>
+      <rect x="80" y="120" width="100" height="140" rx="4" fill="var(--illus-warm-surface)" opacity="0.5"/>
+      <rect x="85" y="130" width="25" height="30" rx="2" fill="var(--illus-sky)" opacity="0.4"/>
+      <rect x="120" y="135" width="20" height="25" rx="2" fill="var(--illus-bark)" opacity="0.3"/>
+      <path d="M85 170 L175 170" stroke="var(--illus-bark)" stroke-width="0.5" opacity="0.3"/>
+      <circle cx="250" cy="150" r="40" fill="var(--illus-blush)" opacity="0.15"/>
+      <circle cx="260" cy="140" r="3" fill="var(--illus-blush)" opacity="0.4"/>
+      <circle cx="240" cy="160" r="2" fill="var(--accent)" opacity="0.4"/>
+      <path d="M220 180 Q240 160,260 175 T300 155" stroke="var(--accent)" stroke-width="1.5" fill="none" opacity="0.3" stroke-linecap="round"/>
+      <path d="M0 250 Q100 230,200 245 T400 235 L400 300 L0 300Z" fill="var(--accent)" opacity="0.06"/>
+      <rect x="200" y="200" width="60" height="80" rx="8" fill="var(--illus-cream)" opacity="0.6"/>
+      <circle cx="230" cy="225" r="10" fill="var(--illus-blush)" opacity="0.3"/>
+      <path d="M215 250 L245 250" stroke="var(--illus-bark)" stroke-width="0.5" opacity="0.3"/>
+    </svg>`,
+    elderly: `<svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="sky-e" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--illus-cream)"/><stop offset="1" stop-color="var(--bg-primary)"/></linearGradient></defs>
+      <rect width="400" height="300" fill="url(#sky-e)"/>
+      <circle cx="300" cy="50" r="35" fill="var(--illus-gold)" opacity="0.3"/>
+      <path d="M60 180 Q65 140,70 155 T80 120 L85 180Z" fill="var(--illus-leaf)" opacity="0.3"/>
+      <path d="M75 180 Q80 150,85 160 T95 135 L100 180Z" fill="var(--illus-leaf-dark)" opacity="0.25"/>
+      <path d="M300 180 Q305 145,310 158 T320 125 L325 180Z" fill="var(--illus-leaf)" opacity="0.3"/>
+      <path d="M100 220 Q120 210,140 218 T180 208 T220 215 T260 210 L280 220 L280 240 L100 240Z" fill="var(--illus-bark)" opacity="0.3"/>
+      <ellipse cx="190" cy="250" rx="80" ry="20" fill="var(--illus-sage)" opacity="0.15"/>
+      <path d="M150 200 Q155 195,160 198 Q165 195,170 200 Q165 198,160 202 Q155 198,150 200Z" fill="var(--illus-petal)" opacity="0.5"/>
+      <path d="M200 190 Q205 185,210 188 Q215 185,220 190 Q215 188,210 192 Q205 188,200 190Z" fill="var(--illus-petal)" opacity="0.4"/>
+      <path d="M170 208 Q175 203,180 206 Q185 203,190 208 Q185 206,180 210 Q175 206,170 208Z" fill="var(--illus-petal)" opacity="0.35"/>
+      <rect x="220" y="230" width="50" height="35" rx="3" fill="var(--illus-bark)" opacity="0.25"/>
+      <path d="M225 240 L265 240 M225 248 L260 248 M225 256 L250 256" stroke="var(--illus-bark-dark)" stroke-width="0.5" opacity="0.3"/>
+      <path d="M0 270 Q100 255,200 265 T400 258 L400 300 L0 300Z" fill="var(--accent)" opacity="0.06"/>
+    </svg>`
+  };
+
+  const thumbSVGs = {
+    adult: `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><rect width="64" height="64" fill="var(--bg-secondary)"/><circle cx="48" cy="16" r="6" fill="var(--illus-gold)" opacity="0.2"/><path d="M0 40 Q16 32,32 38 T64 34 L64 64 L0 64Z" fill="var(--illus-night-deep)"/></svg>`,
+    child: `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><rect width="64" height="64" fill="var(--illus-parchment)"/><circle cx="48" cy="16" r="8" fill="var(--illus-sun)" opacity="0.3"/><path d="M0 48 Q16 40,32 46 T64 42 L64 64 L0 64Z" fill="var(--illus-meadow)" opacity="0.3"/></svg>`,
+    teen: `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><rect width="64" height="64" fill="var(--bg-primary)"/><circle cx="32" cy="32" r="15" fill="var(--accent)" opacity="0.1"/></svg>`,
+    elderly: `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><rect width="64" height="64" fill="var(--bg-primary)"/><circle cx="48" cy="16" r="8" fill="var(--illus-gold)" opacity="0.25"/><path d="M16 48 Q20 38,24 44 T32 35 L36 48Z" fill="var(--illus-leaf)" opacity="0.25"/></svg>`
+  };
+
+  // ===== SCREEN MANAGEMENT =====
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    const target = document.getElementById(id);
+    if (target) target.classList.add('active');
+    currentScreen = id;
+
+    // Update nav
+    document.querySelectorAll('.nav-item').forEach(n => {
+      n.classList.toggle('active', n.dataset.screen === id);
+    });
+
+    // Show/hide nav on certain screens
+    const hideNav = ['splash', 'modeSelect', 'generating'];
+    document.getElementById('bottomNav').style.display = hideNav.includes(id) ? 'none' : 'flex';
+  }
+
+  // ===== MODE SWITCHING =====
+  function setMode(mode) {
+    currentMode = mode;
+    document.documentElement.setAttribute('data-mode', mode);
+    document.getElementById('modeLabel').textContent = modeNames[mode];
+    document.getElementById('settingsModeName').textContent = modeNames[mode];
+    const g = greetings[mode];
+    document.getElementById('greetingText').textContent = g.h;
+    document.getElementById('greetingSub').textContent = g.s;
+
+    // Update dark mode toggle state
+    const darkToggle = document.getElementById('toggleDarkMode');
+    if (mode === 'adult') { darkToggle.classList.add('on'); }
+    else { darkToggle.classList.remove('on'); }
+  }
+
+  // ===== SPLASH AUTO-ADVANCE =====
+  setTimeout(() => showScreen('modeSelect'), 2500);
+
+  // ===== MODE SELECT =====
+  document.querySelectorAll('.mode-card').forEach(card => {
+    card.addEventListener('click', () => {
+      setMode(card.dataset.modeVal);
+      showScreen('home');
+    });
+  });
+
+  // ===== MODE SWITCHER (from home) =====
+  document.getElementById('modeSwitchBtn').addEventListener('click', () => showScreen('modeSelect'));
+
+  // ===== BOTTOM NAV =====
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', () => showScreen(item.dataset.screen));
+  });
+
+  // ===== INPUT TABS =====
+  document.querySelectorAll('.input-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.input-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      currentTab = tab.dataset.tab;
+      document.querySelectorAll('.input-panel').forEach(p => p.classList.remove('active'));
+      const panelMap = { text: 'panelText', voice: 'panelVoice', photo: 'panelPhoto', doodle: 'panelDoodle' };
+      document.getElementById(panelMap[currentTab]).classList.add('active');
+    });
+  });
+
+  // ===== VOICE RECORDING SIMULATION =====
+  const voiceBtn = document.getElementById('voiceBtn');
+  const voiceStatus = document.getElementById('voiceStatus');
+  const voiceDuration = document.getElementById('voiceDuration');
+  const voiceWaveform = document.getElementById('voiceWaveform');
+
+  // Init waveform bars
+  for (let i = 0; i < 24; i++) {
+    const bar = document.createElement('div');
+    bar.className = 'bar';
+    bar.style.height = '6px';
+    voiceWaveform.appendChild(bar);
+  }
+
+  voiceBtn.addEventListener('click', () => {
+    if (!isRecording) {
+      isRecording = true;
+      recordSeconds = 0;
+      voiceBtn.classList.add('recording');
+      voiceStatus.textContent = '正在录音...';
+      voiceWaveform.classList.add('active');
+      recordTimer = setInterval(() => {
+        recordSeconds++;
+        const m = String(Math.floor(recordSeconds / 60)).padStart(2, '0');
+        const s = String(recordSeconds % 60).padStart(2, '0');
+        voiceDuration.textContent = m + ':' + s;
+        // Random waveform
+        voiceWaveform.querySelectorAll('.bar').forEach(bar => {
+          bar.style.height = (4 + Math.random() * 30) + 'px';
+        });
+      }, 1000);
+    } else {
+      isRecording = false;
+      voiceBtn.classList.remove('recording');
+      voiceStatus.textContent = '录音完成，轻触重新录制';
+      voiceWaveform.classList.remove('active');
+      clearInterval(recordTimer);
+      voiceWaveform.querySelectorAll('.bar').forEach(bar => {
+        bar.style.height = '6px';
+      });
+    }
+  });
+
+  // ===== DOODLE CANVAS =====
+  const canvas = document.getElementById('doodleCanvas');
+  const ctx = canvas.getContext('2d');
+  let drawing = false;
+  let drawColor = '#C8956C';
+  let drawSize = 4;
+
+  function resizeCanvas() {
+    const wrap = canvas.parentElement;
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = wrap.clientWidth * dpr;
+    canvas.height = wrap.clientHeight * dpr;
+    canvas.style.width = wrap.clientWidth + 'px';
+    canvas.style.height = wrap.clientHeight + 'px';
+    ctx.scale(dpr, dpr);
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+  }
+  setTimeout(resizeCanvas, 100);
+
+  function getPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const t = e.touches ? e.touches[0] : e;
+    return { x: t.clientX - rect.left, y: t.clientY - rect.top };
+  }
+
+  canvas.addEventListener('mousedown', e => { drawing = true; const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); });
+  canvas.addEventListener('mousemove', e => { if (!drawing) return; const p = getPos(e); ctx.strokeStyle = drawColor; ctx.lineWidth = drawSize; ctx.lineTo(p.x, p.y); ctx.stroke(); });
+  canvas.addEventListener('mouseup', () => drawing = false);
+  canvas.addEventListener('mouseleave', () => drawing = false);
+
+  canvas.addEventListener('touchstart', e => { e.preventDefault(); drawing = true; const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); }, { passive: false });
+  canvas.addEventListener('touchmove', e => { e.preventDefault(); if (!drawing) return; const p = getPos(e); ctx.strokeStyle = drawColor; ctx.lineWidth = drawSize; ctx.lineTo(p.x, p.y); ctx.stroke(); }, { passive: false });
+  canvas.addEventListener('touchend', () => drawing = false);
+
+  document.querySelectorAll('.doodle-color').forEach(c => {
+    c.addEventListener('click', () => {
+      document.querySelectorAll('.doodle-color').forEach(x => x.classList.remove('active'));
+      c.classList.add('active');
+      drawColor = c.dataset.color;
+    });
+  });
+  document.querySelectorAll('.doodle-size-dot').forEach(d => {
+    d.addEventListener('click', () => {
+      document.querySelectorAll('.doodle-size-dot').forEach(x => x.classList.remove('active'));
+      d.classList.add('active');
+      drawSize = parseInt(d.dataset.size);
+    });
+  });
+  document.getElementById('doodleClearBtn').addEventListener('click', () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  });
+
+  // ===== API =====
+  async function apiGenerate(content, theme) {
+    const res = await fetch(API_BASE + '/api/echo/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'text', content: content, theme: theme })
+    });
+    if (!res.ok) throw new Error('生成失败 (' + res.status + ')');
+    return res.json();
+  }
+
+  async function apiGetTheme() {
+    const res = await fetch(API_BASE + '/api/theme/today');
+    if (!res.ok) throw new Error('主题获取失败');
+    return res.json();
+  }
+
+  async function apiGetDiary() {
+    const res = await fetch(API_BASE + '/api/diary');
+    if (!res.ok) throw new Error('日记获取失败');
+    return res.json();
+  }
+
+  function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+  function fmtTime(s) {
+    s = Math.floor(s || 0);
+    return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
+  }
+
+  // ===== GENERATE BUTTON =====
+  document.getElementById('generateBtn').addEventListener('click', startGeneration);
+
+  async function startGeneration() {
+    const content = document.getElementById('textInput').value.trim();
+    if (!content) { return; }
+
+    showScreen('generating');
+
+    // Phase 1: 墨滴动画（与 API 并行）
+    document.getElementById('genPhase1').classList.add('active');
+
+    let result;
+    try {
+      [result] = await Promise.all([
+        wait(2500),
+        apiGenerate(content, currentTheme)
+      ]);
+    } catch (err) {
+      alert('生成失败：' + err.message);
+      showScreen('home');
+      return;
+    }
+
+    // Phase 2: 打字机叙事
+    document.getElementById('genPhase1').classList.remove('active');
+    document.getElementById('genPhase2').classList.add('active');
+    const el = document.getElementById('genNarrative');
+    el.innerHTML = '';
+    for (const ch of (result.narrative || '')) {
+      const span = document.createElement('span');
+      span.className = 'char';
+      span.textContent = ch;
+      span.style.animationDelay = '0s';
+      el.appendChild(span);
+      await wait(45);
+    }
+    await wait(400);
+
+    // Phase 3: 波形（预加载音频）
+    document.getElementById('genPhase2').classList.remove('active');
+    document.getElementById('genPhase3').classList.add('active');
+    buildGenWaveform();
+    if (result.audio_url) {
+      if (audioElement) { audioElement.pause(); }
+      audioElement = new Audio(result.audio_url);
+      currentAudioUrl = result.audio_url;
+      audioElement.addEventListener('timeupdate', () => {
+        const pct = audioElement.duration ? (audioElement.currentTime / audioElement.duration) * 100 : 0;
+        playerProgressFill.style.width = pct + '%';
+        playerCurrentTime.textContent = fmtTime(audioElement.currentTime);
+      });
+      audioElement.addEventListener('loadedmetadata', () => {
+        document.querySelector('.player-duration').textContent = fmtTime(audioElement.duration);
+        document.querySelector('.player-time span:last-child').textContent = fmtTime(audioElement.duration);
+      });
+      audioElement.addEventListener('ended', () => {
+        isPlaying = false;
+        playerPlayBtn.innerHTML = '<svg viewBox="0 0 18 18" fill="currentColor"><path d="M4 2l12 7-12 7V2z"/></svg>';
+      });
+    }
+    await wait(2500);
+
+    // Phase 4: 图片揭示
+    document.getElementById('genPhase3').classList.remove('active');
+    document.getElementById('genPhase4').classList.add('active');
+    document.getElementById('genImageReveal').innerHTML = heroSVGs[currentMode];
+    await wait(2000);
+
+    // 展示回声卡片
+    currentEchoId = result.id;
+    showEchoCard(result);
+  }
+
+  function typewriteNarrative(text) {
+    const el = document.getElementById('genNarrative');
+    el.innerHTML = '';
+    const chars = text.split('');
+    chars.forEach((ch, i) => {
+      const span = document.createElement('span');
+      span.className = 'char';
+      span.textContent = ch;
+      span.style.animationDelay = (i * 0.06) + 's';
+      el.appendChild(span);
+    });
+  }
+
+  function buildGenWaveform() {
+    const wrap = document.getElementById('genWaveform');
+    wrap.innerHTML = '';
+    for (let i = 0; i < 40; i++) {
+      const bar = document.createElement('div');
+      bar.className = 'bar';
+      const h = 8 + Math.random() * 40;
+      bar.style.setProperty('--h', h + 'px');
+      bar.style.height = '6px';
+      bar.style.animationDelay = (i * 0.05) + 's';
+      wrap.appendChild(bar);
+    }
+  }
+
+  function showEchoCard(result) {
+    const titles = {adult:'城市暮色中的自我对话',child:'小松鼠的金色松果',teen:'午后课桌上的小星球',elderly:'桂花香里的慢时光'};
+    document.getElementById('echoHero').innerHTML = heroSVGs[currentMode] +
+      '<div class="overlay"><p class="echo-card-date">' + new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' }) + ' 夜晚</p><h2 class="echo-card-title">' + (titles[currentMode] || '回声') + '</h2></div>';
+    document.getElementById('narrativeText').textContent = result ? (result.narrative || '') : narratives[currentMode];
+    document.getElementById('echoModeTag').textContent = modeNames[currentMode];
+    showScreen('echoCard');
+    resetPlayer();
+  }
+
+  // ===== AUDIO PLAYER SIMULATION =====
+  const playerPlayBtn = document.getElementById('playerPlayBtn');
+  const playerProgressFill = document.getElementById('playerProgressFill');
+  const playerCurrentTime = document.getElementById('playerCurrentTime');
+  const playerWave = document.getElementById('playerWave');
+
+  // Build player wave bars
+  for (let i = 0; i < 50; i++) {
+    const bar = document.createElement('div');
+    bar.className = 'bar';
+    bar.style.height = (4 + Math.random() * 22) + 'px';
+    playerWave.appendChild(bar);
+  }
+
+  playerPlayBtn.addEventListener('click', () => {
+    if (isPlaying) {
+      pausePlayer();
+    } else {
+      startPlayer();
+    }
+  });
+
+  function startPlayer() {
+    if (!audioElement) return;
+    isPlaying = true;
+    playerPlayBtn.innerHTML = '<svg viewBox="0 0 18 18" fill="currentColor"><rect x="4" y="3" width="3.5" height="12" rx="1"/><rect x="10.5" y="3" width="3.5" height="12" rx="1"/></svg>';
+    audioElement.play();
+  }
+
+  function pausePlayer() {
+    if (!audioElement) return;
+    isPlaying = false;
+    playerPlayBtn.innerHTML = '<svg viewBox="0 0 18 18" fill="currentColor"><path d="M4 2l12 7-12 7V2z"/></svg>';
+    audioElement.pause();
+  }
+
+  function resetPlayer() {
+    pausePlayer();
+    playProgress = 0;
+    updatePlayerUI();
+  }
+
+  function updatePlayerUI() {
+    const dur = audioElement ? (audioElement.duration || 0) : 0;
+    const pct = dur ? (playProgress / dur) * 100 : 0;
+    playerProgressFill.style.width = pct + '%';
+    playerCurrentTime.textContent = fmtTime(playProgress);
+
+    // Update wave bars
+    const playedBars = Math.floor((pct / 100) * playerWave.children.length);
+    Array.from(playerWave.children).forEach((bar, i) => {
+      bar.classList.toggle('played', i < playedBars);
+    });
+  }
+
+  // ===== SAVE ECHO =====
+  document.getElementById('saveEchoBtn').addEventListener('click', () => {
+    showScreen('myEchoes');
+    renderEchoList('all');
+  });
+
+  // ===== MY ECHOES =====
+  document.querySelectorAll('.filter-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      renderEchoList(chip.dataset.filter);
+    });
+  });
+
+  async function renderEchoList(filter) {
+    let data;
+    try {
+      data = await apiGetDiary();
+    } catch (err) {
+      document.getElementById('echoesList').innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:40px;">暂无回声</p>';
+      return;
+    }
+    const inputLabels = { text: '文字', voice: '语音', image: '拍照' };
+    let cards = [];
+    Object.keys(data).forEach(date => {
+      (data[date] || []).forEach(rec => {
+        const n = rec.narrative || '';
+        cards.push({
+          mode: 'adult',
+          title: n.slice(0, 12),
+          excerpt: n.slice(0, 30) + (n.length > 30 ? '...' : ''),
+          date: date,
+          input: inputLabels[rec.input_type] || '文字',
+          audio_url: rec.audio_url || ''
+        });
+      });
+    });
+    const filtered = filter && filter !== 'all' ? cards.filter(e => e.mode === filter) : cards;
+    const list = document.getElementById('echoesList');
+    list.innerHTML = filtered.map(e =>
+      '<div class="echo-item" data-component="Echo Item">' +
+        '<div class="echo-item-thumb">' + thumbSVGs[e.mode] + '</div>' +
+        '<div class="echo-item-info">' +
+          '<p class="echo-item-title">' + e.title + '</p>' +
+          '<p class="echo-item-excerpt">' + e.excerpt + '</p>' +
+          '<div class="echo-item-meta">' +
+            '<span>' + e.date + '</span><span>·</span>' +
+            '<span>' + e.input + '</span><span>·</span>' +
+            '<span>' + modeNames[e.mode] + '</span>' +
+          '</div>' +
+        '</div>' +
+      '</div>'
+    ).join('');
+  }
+
+  // Initial render
+  renderEchoList('all');
+
+  // ===== SETTINGS =====
+  document.getElementById('settingsModeRow').addEventListener('click', () => showScreen('modeSelect'));
+
+  document.querySelectorAll('.toggle').forEach(toggle => {
+    toggle.addEventListener('click', () => toggle.classList.toggle('on'));
+  });
+
+  // ===== INIT =====
+  showScreen('splash');
+  setMode('adult');
+  apiGetTheme().then(t => { currentTheme = t.text || ''; }).catch(() => {});
+
+})();
+</script>
+</body>
+</html>

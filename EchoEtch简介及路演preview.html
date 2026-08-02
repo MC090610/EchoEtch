@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>聲畫合鳴 Echo & Etch - 创新创业路演演示页</title>
+    <!-- 稳定CDN资源 -->
+    <script src="/frontend/tailwind.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css" media="all">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/v4-shims.min.css" media="all">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#8BC6A0',
+                        secondary: '#F5A0B8',
+                        youth: '#8BC6A0',
+                        children: '#F5A0B8',
+                        adult: '#8BA89A',
+                        elderly: '#6B8F71',
+                    },
+                    fontFamily: {
+                        'sans': ['system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .gradient-bg {
+                background: linear-gradient(135deg, #F0F4F8 0%, #EAE5DD 100%);
+            }
+            .glass-effect {
+                backdrop-filter: blur(10px);
+                background: rgba(255, 255, 0.8);
+            }
+            .phone-frame {
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 25);
+                border-radius: 32px;
+                overflow: hidden;
+                transition: all 0.5s ease;
+            }
+            .nav-dot {
+                width: 12px;
+                height: 12px;
+                border-radius: 50%;
+                background: #CBD5E1;
+                transition: all 0.3s ease;
+            }
+            .nav-dot.active {
+                background: #8BC6A0;
+                transform: scale(1.2);
+            }
+            .tier-content {
+                will-change: opacity;
+                transition: opacity 0.4s ease;
+            }
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen font-sans overflow-x-hidden">
+    <!-- 顶部章节导航圆点 -->
+    <div class="fixed top-4 left-1/2 -translate-x-1/2 flex gap-2 z-50">
+        <div class="nav-dot" data-section="hero"></div>
+        <div class="nav-dot" data-section="painpoint"></div>
+        <div class="nav-dot" data-section="solution"></div>
+        <div class="nav-dot" data-section="demo"></div>
+        <div class="nav-dot" data-section="business"></div>
+        <div class="nav-dot" data-section="team"></div>
+    </div>
+
+    <!-- 首页封面 -->
+    <section id="hero" class="min-h-screen flex items-center justify-center px-4">
+        <div class="text-center max-w-4xl">
+            <h1 class="text-6xl font-bold text-gray-800 mb-6">
+                <span class="text-primary">聲畫合鳴</span>
+                <span class="text-gray-600">Echo & Etch</span>
+            </h1>
+            <p class="text-xl text-gray-600 mb-8">全年龄段私有化时序声画疗愈平台</p>
+            <div class="flex flex-wrap justify-center gap-4">
+                <a href="#painpoint" class="bg-primary text-white px-8 py-3 rounded-full font-semibold hover:bg-green-500 transition-all">
+                    <i class="fas fa-play mr-2"></i>开始演示
+                </a>
+                <a href="https://gitee.com/monicabear/EchoEtch" target="_blank" rel="noopener noreferrer" class="bg-white text-gray-800 px-8 py-3 rounded-full border border-gray-300 hover:shadow-lg transition-all">
+                    <i class="fab fa-git-alt mr-2"></i>项目仓库
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 市场痛点板块 -->
+    <section id="painpoint" class="min-h-screen flex items-center px-4 py-20">
+        <div class="max-w-6xl mx-auto w-full">
+            <h2 class="text-4xl font-bold text-center text-gray-800 mb-12">市场痛点：情绪陪伴产品全面割裂</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-white p-6 rounded-2xl shadow-lg text-center">
+                    <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-child text-2xl text-red-500"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">传统儿童故事机</h3>
+                    <p class="text-gray-600">内置固定童话，无法记录孩子涂鸦、日常真实故事，长大直接闲置。</p>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-lg text-center">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-user-graduate text-2xl text-blue-500"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">社交类日记APP</h3>
+                    <p class="text-gray-600">依赖匿名广场，隐私风险高，无长期时序记忆，无法生成专属成长叙事。</p>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-lg text-center">
+                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-brain text-2xl text-green-500"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">标准化冥想软件</h3>
+                    <p class="text-gray-600">统一通用文案，无法结合个人生活经历，无线下实体陪伴仪式感。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 核心解决方案板块 -->
+    <section id="solution" class="min-h-screen flex items-center px-4 py-20">
+        <div class="max-w-6xl mx-auto w-full">
+            <h2 class="text-4xl font-bold text-center text-gray-800 mb-12">解决方案：全生命周期私人记忆闭环</h2>
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h3 class="text-2xl font-semibold mb-6 text-gray-800">核心壁垒：时序AI回声机制</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-start">
+                            <div class="w-8 h-8 bg-primary rounded-full flex-shrink-0 flex items-center justify-center mr-4 mt-1">
+                                <span class="text-white font-bold text-sm">1</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-800">多模态自由记录</h4>
+                                <p class="text-gray-600">文字、语音、手绘涂鸦、拍照多渠道录入日常心绪</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="w-8 h-8 bg-primary rounded-full flex-shrink-0 flex items-center justify-center mr-4 mt-1">
+                                <span class="text-white font-bold text-sm">2</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-800">时序长期沉淀</h4>
+                                <p class="text-gray-600">完整时间线归档全年记忆，搭建专属个人情绪档案库</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="w-8 h-8 bg-primary rounded-full flex-shrink-0 flex items-center justify-center mr-4 mt-1">
+                                <span class="text-white font-bold text-sm">3</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-800">AI专属回声叙事（多Agent协同）</h4>
+                                <p class="text-gray-600">多Agent心理专家分工生成，读取长期记录产出私人故事与冥想音频，越记录越懂你</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="w-8 h-8 bg-primary rounded-full flex-shrink-0 flex items-center justify-center mr-4 mt-1">
+                                <span class="text-white font-bold text-sm">4</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-800">软硬件一体陪伴</h4>
+                                <p class="text-gray-600">配套3D打印情绪摆件，线上记忆落地线下实体陪伴</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start mt-2 p-4 rounded-xl bg-primary/10 border border-primary/20">
+                            <div class="w-8 h-8 bg-primary rounded-full flex-shrink-0 flex items-center justify-center mr-4 mt-1">
+                                <span class="text-white font-bold text-sm">5</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-800">多Agent心理专家分工 + RAG知识库</h4>
+                                <p class="text-gray-600">情绪评估→疗愈决策→叙事生成→安全风控→音频适配，多角色协同；RAG知识库约束生成，适配当下情绪并规避心理风险</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <!-- 增加图片加载容错 -->
+                    <div class="rounded-2xl shadow-lg mx-auto flex items-center justify-center" style="width:100%;max-width:500px;height:120px;background:linear-gradient(135deg,#8BC6A0,#6B8F71);color:white;font-size:28px;font-weight:700;letter-spacing:2px;">聲畫合鳴 Echo and Etch</div>
+                    <div class="hidden text-gray-400 text-sm mt-2">示意图加载失败，可替换本地产品效果图</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- UI交互演示板块：嵌入真实产品 -->
+    <section id="demo" class="min-h-screen flex items-center px-4 py-20">
+        <div class="max-w-6xl mx-auto w-full">
+            <h2 class="text-4xl font-bold text-center text-gray-800 mb-4">产品交互演示：四套自适应分层UI</h2>
+            <p class="text-center text-gray-500 mb-8">以下为真实可交互产品，支持文字/语音/拍照/涂鸦四种输入，底部可切换四套分层界面</p>
+            <!-- 手机样机 + 真实产品 iframe -->
+            <div class="flex justify-center">
+                <div class="phone-frame w-[390px] h-[720px] bg-white relative overflow-hidden" id="phoneDemo">
+                    <iframe src="frontend/index.html" class="w-full h-full border-0" style="border-radius:32px;" title="EchoEtch 产品演示" loading="lazy"></iframe>
+                </div>
+            </div>
+            <div class="text-center mt-8">
+                <p class="text-gray-500 text-sm">点击上方手机区域即可体验完整功能 · 底部导航栏切换「写日记/归档/我的」</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 商业模式板块 -->
+    <section id="business" class="min-h-screen flex items-center px-4 py-20">
+        <div class="max-w-6xl mx-auto w-full">
+            <h2 class="text-4xl font-bold text-center text-gray-800 mb-12">轻量化商业模式</h2>
+            <div class="grid md:grid-cols-2 gap-12">
+                <div>
+                    <h3 class="text-2xl font-semibold mb-6 text-gray-800">三大收入渠道</h3>
+                    <div class="space-y-6">
+                        <div class="flex items-start">
+                            <div class="w-12 h-12 bg-primary rounded-full flex-shrink-0 flex items-center justify-center mr-4 mt-1">
+                                <i class="fas fa-crown text-white"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-semibold text-gray-800">增值会员订阅</h4>
+                                <p class="text-gray-600">年度情绪复盘、专属音色、完整3D模型源文件</p>
+                                <p class="text-primary font-bold mt-1">12元/月｜98元/年</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="w-12 h-12 bg-secondary rounded-full flex-shrink-0 flex items-center justify-center mr-4 mt-1">
+                                <i class="fas fa-cube text-white"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-semibold text-gray-800">3D打印硬件分润</h4>
+                                <p class="text-gray-600">情绪摆件定制，对接打印服务商抽取10%分润</p>
+                                <p class="text-primary font-bold mt-1">10% 服务分成</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="w-12 h-12 bg-green-500 rounded-full flex-shrink-0 flex items-center justify-center mr-4 mt-1">
+                                <i class="fas fa-building text-white"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-semibold text-gray-800">校园/机构B端合作</h4>
+                                <p class="text-gray-600">中小学心理社团、社区康养批量账号定制报价</p>
+                                <p class="text-primary font-bold mt-1">定制化报价</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-semibold mb-6 text-gray-800">低成本获客路径</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center">
+                            <i class="fas fa-check-circle text-primary mr-3 flex-shrink-0"></i>
+                            <span class="text-gray-700">创新创业大赛、黑客松线下曝光引流</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-check-circle text-primary mr-3 flex-shrink-0"></i>
+                            <span class="text-gray-700">高校心理、文创社团线下体验活动</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-check-circle text-primary mr-3 flex-shrink-0"></i>
+                            <span class="text-gray-700">创客、AI开发社群分享Demo积累种子用户</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-check-circle text-primary mr-3 flex-shrink-0"></i>
+                            <span class="text-gray-700">小红书/抖音分人群治愈内容种草</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 团队板块 -->
+    <section id="team" class="min-h-screen flex items-center px-4 py-20">
+        <div class="max-w-6xl mx-auto w-full">
+            <h2 class="text-4xl font-bold text-center text-gray-800 mb-12">跨专业复合型团队</h2>
+            <div class="grid md:grid-cols-4 gap-8">
+                <div class="text-center">
+                    <div class="w-24 h-24 bg-gradient-to-br from-primary to-green-400 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-user-tie text-white text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">产品经理</h3>
+                    <p class="text-gray-600">全龄需求统筹、商业计划书、路演材料撰写</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-24 h-24 bg-gradient-to-br from-blue-400 to-purple-400 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-code text-white text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">前端开发</h3>
+                    <p class="text-gray-600">四套自适应交互页面、动效实现</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-24 h-24 bg-gradient-to-br from-yellow-400 to-orange-400 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-brain text-white text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">AI算法对接</h3>
+                    <p class="text-gray-600">时序长上下文、回声叙事Prompt体系</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-24 h-24 bg-gradient-to-br from-pink-400 to-red-400 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-cube text-white text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">3D硬件建模</h3>
+                    <p class="text-gray-600">情绪摆件外壳、打印STL输出</p>
+                </div>
+            </div>
+            <div class="text-center mt-12">
+                <p class="text-gray-600 text-lg">大学生创客团队，用轻量化AI硬件打造全年龄段私人情绪陪伴产品。</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="py-8 text-center text-gray-600">
+        <p>&copy; 2026 聲畫合鳴 Echo & Etch 版权所有</p>
+        <p class="mt-2 flex justify-center gap-4">
+            <a href="https://gitee.com/monicabear/EchoEtch" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline">
+                <i class="fab fa-git-alt mr-1"></i>项目仓库
+            </a>
+            <span>|</span>
+            <a href="#" class="text-primary hover:underline">
+                <i class="fas fa-envelope mr-1"></i>联系我们
+            </a>
+        </p>
+    </footer>
+
+    <script>
+        // 滚动节流优化，减少页面卡顿
+        let scrollTimer = null;
+        window.addEventListener('scroll', () => {
+            clearTimeout(scrollTimer);
+            scrollTimer = setTimeout(updateNavDot, 80);
+        })
+        // 导航圆点同步高亮
+        function updateNavDot() {
+            const sections = document.querySelectorAll('section');
+            const dots = document.querySelectorAll('.nav-dot');
+            let currentId = '';
+            sections.forEach(sec => {
+                const top = sec.offsetTop;
+                const h = sec.clientHeight;
+                if (window.scrollY >= top - 220) currentId = sec.id;
+            })
+            dots.forEach(dot => {
+                dot.classList.toggle('active', dot.dataset.section === currentId)
+            })
+        }
+        // 平滑锚点跳转
+        document.querySelectorAll('a[href^="#"]').forEach(link => {
+            link.addEventListener('click', e => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href');
+                const target = document.querySelector(targetId);
+                if(target) target.scrollIntoView({behavior:'smooth', block:'start'})
+            })
+        })
+        // 页面加载初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            updateNavDot();
+        })
+    </script>
+</body>
+</html>

@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-tier="youth">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>聲畫合鳴 — 四套分层 UI 交互预览器</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   OUTER SHELL — Previewer chrome (not part of product design)
+   ============================================================ */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+.shell{
+  --shell-bg:#1A1A2E;--shell-surface:#242440;--shell-fg:#E8E8F0;
+  --shell-muted:#8888AA;--shell-accent:#6C63FF;--shell-border:#333355;
+  font-family:'Noto Sans SC',system-ui,sans-serif;
+  background:var(--shell-bg);color:var(--shell-fg);
+  min-height:100vh;display:flex;flex-direction:column;
+}
+
+/* Tier Switcher Bar */
+.tier-bar{
+  position:sticky;top:0;z-index:999;
+  background:var(--shell-surface);border-bottom:1px solid var(--shell-border);
+  padding:12px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+}
+.tier-bar__label{font-size:13px;font-weight:500;color:var(--shell-muted);white-space:nowrap;letter-spacing:0.04em;}
+.tier-bar__tabs{display:flex;gap:4px;background:rgba(255,255,255,0.04);border-radius:10px;padding:3px;}
+.tier-tab{
+  padding:8px 16px;border-radius:8px;border:none;cursor:pointer;
+  font-size:13px;font-weight:500;color:var(--shell-muted);
+  background:transparent;transition:all 0.25s ease;white-space:nowrap;
+  font-family:inherit;
+}
+.tier-tab:hover{color:var(--shell-fg);background:rgba(255,255,255,0.06);}
+.tier-tab.active{color:#fff;background:var(--shell-accent);box-shadow:0 2px 8px rgba(108,99,255,0.35);}
+.tier-bar__info{margin-left:auto;font-size:12px;color:var(--shell-muted);text-align:right;max-width:320px;}
+.tier-bar__info strong{color:var(--shell-fg);font-weight:500;}
+
+/* Token strip */
+.token-strip{
+  background:var(--shell-surface);border-bottom:1px solid var(--shell-border);
+  padding:8px 20px;display:flex;gap:16px;overflow-x:auto;font-size:11px;
+  color:var(--shell-muted);align-items:center;
+}
+.token-chip{display:flex;align-items:center;gap:5px;white-space:nowrap;}
+.token-chip__swatch{width:14px;height:14px;border-radius:4px;border:1px solid rgba(255,255,255,0.1);}
+
+/* Main layout */
+.shell-main{
+  flex:1;display:flex;justify-content:center;align-items:flex-start;
+  padding:32px 20px 60px;gap:24px;
+}
+
+/* ============================================================
+   PHONE FRAME
+   ============================================================ */
+.phone{
+  width:100%;max-width:430px;background:var(--bg);position:relative;
+  overflow:hidden;min-height:860px;
+  border-radius:32px;box-shadow:0 0 60px rgba(0,0,0,0.3),0 0 0 1px rgba(255,255,255,0.05);
+  transition:background 0.5s ease, box-shadow 0.3s ease;
+}
+
+/* Status Bar */
+.statusbar{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:14px 24px 10px;font-size:12px;font-weight:600;
+  color:var(--text-main);position:sticky;top:0;z-index:100;
+  background:var(--bg);transition:background 0.5s ease,color 0.5s ease;
+}
+.statusbar__time{font-family:'SF Mono','Menlo',monospace;font-size:13px;}
+.statusbar__icons{display:flex;gap:5px;align-items:center;}
+.statusbar__icons svg{width:16px;height:12px;fill:var(--text-main);transition:fill 0.5s ease;}
+
+/* ============================================================
+   TIER TOKEN SYSTEM — 4 complete sets from doc 04
+   ============================================================ */
+
+/* ---- YOUTH 青年清透版 (Baseline) ---- */
+[data-tier="youth"]{
+  --bg:#FAF8F5;--surface:#F0F4F8;--sprout-bg:#FDFCFA;--body-bg:#E8E4DF;
+  --input-bg:#F0FAF4;--input-border:#D4EDDA;--input-placeholder:#A8C4B4;
+  --tag-bg:#EAF6F0;--pink-bg:#FFF5F5;--pink-fill:#F8E8E8;
+  --accent:#8BC6A0;--accent-soft:#D4EDDA;--accent-dark:#5a9e72;
+  --accent-deep:#6BA882;--accent-rgb:139,198,160;
+  --fog-blue:#B8D4E3;--mint:#A8D8C8;--warm-pink:#E8C4C4;--white:#fff;
+  --sunset-gold:#F6D5A8;--sunset-orange:#E8A87C;--sunset-rose:#C38D9E;
+  --sunset-purple:#8B7EB8;--sunset-deep:#6B5B95;--sunset-light:#F9E4B7;
+  --twilight-cloud:#B8A9D4;--twilight-light:#C9B8D8;--twilight-building:#7B6B9E;
+  --tree-green:#6B8F71;--bark:#8B7B6B;--soil:#D4C4A8;--soil-dark:#C4B498;--soil-stroke:#A89878;
+  --text-main:#2D3748;--text-sub:#8B9AAF;--border-base:#E2E8F0;
+  --radius:16px;--radius-lg:24px;
+  --base-font-size:15px;--touch-min:44px;--motion-level:1;
+  --font-main:'Noto Sans SC',system-ui,sans-serif;
+  --font-display:'Noto Sans SC',system-ui,sans-serif;
+  --shadow-fab:0 4px 16px rgba(139,198,160,0.35);
+  --shadow-light:0 2px 8px rgba(0,0,0,0.04);
+  --nav-bg:rgba(250,248,245,0.92);
+}
+
+/* ---- CHILDREN 少儿奶柔启蒙版 ---- */
+[data-tier="children"]{
+  --bg:#FFF9F2;--surface:#FFF3E8;
+  --illus-green-bg:#E8F5E4;
+  --input-bg:#FFF5F0;--input-border:#FDE8EF;--input-placeholder:#D8B8B8;
+  --tag-bg:#FDE8EF;--pink-bg:#FFF5F5;--pink-fill:#F8E8E8;
+  --accent:#F5A0B8;--accent-soft:#FDE8EF;--accent-dark:#D88098;
+  --accent-deep:#E090A8;--accent-rgb:245,160,184;
+  --sprout-green:#A8D8A0;--sky-blue:#B8D8F0;--peach:#F8C8A0;--lavender:#D8C8E8;
+  --fog-blue:#B8D8F0;--mint:#A8D8A0;--warm-pink:#F5A0B8;--white:#fff;
+  --illus-pink:#F5A0B8;--illus-peach:#F8C8A0;--illus-sunny:#F8D878;
+  --illus-sun-core:#FCE8A0;--illus-leaf:#7CB870;--illus-leaf-light:#B8E0B0;
+  --illus-ground:#C8E8C0;--illus-green-dark:#5A9A50;--illus-sky:#B8D8F0;
+  --illus-sky-bg:#E4F0FA;--illus-lavender:#D8C8E8;--illus-cloud:#ffffff;
+  --illus-soil:#D8B898;--illus-petal-bg:#FDE8D8;--illus-deep-pink:#F0909A;
+  --illus-green-mid:#80C898;--illus-star-fill:#F0B080;
+  --sunset-gold:#F8D878;--sunset-orange:#F8C8A0;--sunset-rose:#F5A0B8;
+  --sunset-purple:#D8C8E8;--sunset-deep:#C8A8D8;--sunset-light:#FCE8A0;
+  --twilight-cloud:#D8C8E8;--twilight-light:#E8D8F0;--twilight-building:#C8A8D8;
+  --tree-green:#5A9A50;--bark:#C8A888;--soil:#D8B898;--soil-dark:#C8A888;--soil-stroke:#B89878;
+  --text-main:#4A3728;--text-sub:#B8A090;--border-base:#F0E0D0;
+  --radius:24px;--radius-lg:32px;
+  --base-font-size:16px;--touch-min:62px;--motion-level:0.7;
+  --font-main:'Noto Sans SC',system-ui,sans-serif;
+  --font-display:'Noto Sans SC',system-ui,sans-serif;
+  --shadow-fab:0 4px 16px rgba(245,160,184,0.35);
+  --shadow-light:0 2px 8px rgba(0,0,0,0.04);
+  --nav-bg:rgba(255,249,242,0.92);
+}
+
+/* ---- ADULT 成人哑光疗愈版 ---- */
+[data-tier="adult"]{
+  --bg:#F5F0E8;--surface:#EDE8DF;--parchment:#F8F4EC;--frame-bg:#2C2620;
+  --input-bg:#F8F4EC;--input-border:#DDD5C8;--input-placeholder:#B8A898;
+  --tag-bg:#EDE8DF;--pink-bg:#F5F0E8;--pink-fill:#EDE8DF;
+  --accent:#8BA89A;--accent-deep:#5C7A6A;--accent-soft:rgba(139,168,154,0.12);
+  --accent-rgb:139,168,154;
+  --tan:#C4A882;--ink:#4A4038;
+  --fog-blue:#B8C8C0;--mint:#8BA89A;--warm-pink:#C4A882;--white:#F8F4EC;
+  --illus-sky:#3D3228;--illus-ground:#4A4038;
+  --sunset-gold:#C4A882;--sunset-orange:#B89878;--sunset-rose:#8BA89A;
+  --sunset-purple:#6B7B8B;--sunset-deep:#4A5A6A;--sunset-light:#DDD5C8;
+  --twilight-cloud:#8B9AAF;--twilight-light:#B8C8C0;--twilight-building:#5C7A6A;
+  --tree-green:#5C7A6A;--bark:#8B7B6B;--soil:#C4A882;--soil-dark:#B89878;--soil-stroke:#9B8E80;
+  --text-main:#3D3228;--text-sub:#9B8E80;--border-base:#DDD5C8;
+  --radius:12px;--radius-lg:18px;
+  --base-font-size:14px;--touch-min:44px;--motion-level:0.8;
+  --font-main:'Noto Serif SC','Noto Sans SC',serif;
+  --font-display:'Noto Serif SC','Noto Sans SC',serif;
+  --shadow-fab:0 4px 16px rgba(139,168,154,0.3);
+  --shadow-light:0 2px 8px rgba(0,0,0,0.04);
+  --nav-bg:rgba(245,240,232,0.92);
+}
+
+/* ---- ELDERLY 中老年适老康养版 ---- */
+[data-tier="elderly"]{
+  --bg:#F5EDE0;--surface:#EDE5D8;--cream:#FAF4EA;
+  --input-bg:#FAF4EA;--input-border:#D8CCBC;--input-placeholder:#B8A898;
+  --tag-bg:#EDE5D8;--pink-bg:#F5EDE0;--pink-fill:#EDE5D8;
+  --accent:#6B8F71;--accent-soft:#D4E8D4;--accent-deep:#5A7A60;
+  --accent-rgb:107,143,113;
+  --warm-brown:#8B7355;--tea:#D4C4A8;--ink:#4A3C30;
+  --fog-blue:#C8D8C8;--mint:#6B8F71;--warm-pink:#C4847A;--white:#fff;
+  --sky-warm:#E8D8C4;--mountain:#A89880;--blossom:#C4847A;
+  --teapot-light:#A8906E;--cream-light:#F0E4D4;
+  --sunset-gold:#D4C4A8;--sunset-orange:#C4A882;--sunset-rose:#C4847A;
+  --sunset-purple:#A89880;--sunset-deep:#8B7355;--sunset-light:#E8D8C4;
+  --twilight-cloud:#B8A898;--twilight-light:#D4C4A8;--twilight-building:#8B7355;
+  --tree-green:#5A7A60;--bark:#8B7355;--soil:#D4C4A8;--soil-dark:#C4B498;--soil-stroke:#A89880;
+  --text-main:#3A2E22;--text-sub:#8B7B68;--border-base:#D8CCBC;
+  --radius:14px;--radius-lg:20px;
+  --base-font-size:18px;--touch-min:64px;--motion-level:0.3;
+  --font-main:'Noto Sans SC',system-ui,sans-serif;
+  --font-display:'Noto Sans SC',system-ui,sans-serif;
+  --shadow-fab:0 4px 16px rgba(107,143,113,0.35);
+  --shadow-light:0 2px 8px rgba(0,0,0,0.04);
+  --nav-bg:rgba(245,237,224,0.92);
+}
+
+/* ============================================================
+   GLOBAL PRODUCT TOKENS (shared across tiers)
+   ============================================================ */
+.phone{font-family:var(--font-main);font-size:var(--base-font-size);line-height:1.6;color:var(--text-main);transition:color 0.5s ease;}
+.page-padding{padding:0 20px;}
+
+/* Page system */
+.page{display:none;opacity:0;transition:opacity 0.35s ease;padding-bottom:100px;min-height:780px;}
+.page.active{display:block;opacity:1;animation:fadeIn 0.35s ease forwards;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* Bottom Nav */
+.bnav{
+  position:absolute;bottom:0;left:0;right:0;
+  display:flex;justify-content:space-around;align-items:center;
+  background:var(--nav-bg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border-top:1px solid var(--border-base);
+  padding:8px 0 calc(8px + env(safe-area-inset-bottom,8px));z-index:200;
+  transition:background 0.5s ease,border-color 0.5s ease;
+}
+.bnav-item{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:6px 16px;min-width:64px;min-height:var(--touch-min);
+  justify-content:center;cursor:pointer;border:none;background:none;
+  color:var(--text-sub);font-size:11px;letter-spacing:0.02em;
+  font-family:var(--font-main);transition:color 0.3s ease;
+}
+.bnav-item svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;transition:stroke 0.3s ease;}
+.bnav-item.active{color:var(--accent);}
+.bnav-item.active svg{stroke:var(--accent);}
+
+/* FAB */
+.fab{
+  position:absolute;right:20px;bottom:80px;z-index:150;
+  width:56px;height:56px;border-radius:50%;border:none;cursor:pointer;
+  background:var(--accent);color:#fff;font-size:28px;font-weight:300;
+  box-shadow:var(--shadow-fab);
+  display:flex;align-items:center;justify-content:center;
+  transition:all 0.3s ease;
+}
+.fab:hover{transform:scale(1.08);}
+.fab:active{transform:scale(0.95);}
+[data-tier="children"] .fab{width:68px;height:68px;font-size:32px;}
+[data-tier="elderly"] .fab{width:68px;height:68px;font-size:32px;}
+
+/* ============================================================
+   PAGE 1: CALENDAR HOME
+   ============================================================ */
+.cal-header{padding:16px 20px 12px;}
+.cal-header__greeting{font-size:calc(var(--base-font-size) * 1.4);font-weight:500;font-family:var(--font-display);margin-bottom:4px;}
+.cal-header__sub{font-size:var(--base-font-size);color:var(--text-sub);}
+.cal-header__stats{display:flex;gap:12px;margin-top:12px;}
+.stat-chip{
+  font-size:calc(var(--base-font-size) * 0.75);color:var(--text-sub);
+  background:var(--surface);padding:4px 10px;border-radius:var(--radius);
+  transition:background 0.5s ease,border-radius 0.5s ease;
+}
+.cal-month{
+  padding:8px 20px;font-size:calc(var(--base-font-size) * 0.85);font-weight:500;
+  color:var(--accent);letter-spacing:0.04em;
+}
+.stage-badge{
+  display:inline-flex;align-items:center;gap:4px;
+  background:var(--accent-soft);color:var(--accent-dark);
+  font-size:calc(var(--base-font-size) * 0.75);padding:3px 10px;
+  border-radius:var(--radius);font-weight:500;margin-left:8px;
+  transition:all 0.5s ease;
+}
+.timeline{padding:0 20px;}
+.t-entry{
+  display:flex;gap:12px;margin-bottom:12px;cursor:pointer;
+  padding:14px;background:var(--surface);border-radius:var(--radius);
+  border-left:3px solid var(--accent);
+  box-shadow:var(--shadow-light);
+  transition:all 0.5s ease;
+}
+.t-entry:hover{transform:translateX(3px);}
+.t-entry__date{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-width:48px;font-size:calc(var(--base-font-size) * 0.7);color:var(--text-sub);
+  line-height:1.4;
+}
+.t-entry__date strong{font-size:calc(var(--base-font-size) * 1.2);color:var(--text-main);font-weight:600;}
+.t-entry__body{flex:1;}
+.t-entry__title{font-weight:500;margin-bottom:4px;font-size:var(--base-font-size);}
+.t-entry__excerpt{font-size:calc(var(--base-font-size) * 0.85);color:var(--text-sub);line-height:1.5;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.t-entry__tags{display:flex;gap:6px;margin-top:6px;}
+.tag{
+  font-size:calc(var(--base-font-size) * 0.7);padding:2px 8px;
+  border-radius:var(--radius);background:var(--tag-bg);color:var(--accent-deep);
+  transition:all 0.5s ease;
+}
+
+/* ============================================================
+   PAGE 2: JOURNAL ENTRY
+   ============================================================ */
+.journal-tabs{
+  display:flex;gap:0;padding:12px 20px 0;
+}
+.journal-tab{
+  flex:1;padding:10px 0;text-align:center;font-size:calc(var(--base-font-size) * 0.85);
+  font-weight:500;color:var(--text-sub);border:none;background:none;
+  cursor:pointer;border-bottom:2px solid transparent;
+  font-family:var(--font-main);transition:all 0.3s ease;
+  min-height:var(--touch-min);
+}
+.journal-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.journal-content{padding:16px 20px;}
+.journal-textarea{
+  width:100%;min-height:200px;border:1.5px solid var(--input-border);
+  border-radius:var(--radius);padding:16px;font-size:var(--base-font-size);
+  font-family:var(--font-main);color:var(--text-main);background:var(--input-bg);
+  resize:none;line-height:1.8;transition:all 0.5s ease;
+}
+.journal-textarea::placeholder{color:var(--input-placeholder);}
+.journal-textarea:focus{outline:none;border-color:var(--accent);}
+/* Children: bigger doodle area */
+.doodle-area{
+  margin-top:16px;border:1.5px dashed var(--input-border);border-radius:var(--radius);
+  background:var(--white);position:relative;overflow:hidden;
+  transition:all 0.5s ease;
+}
+[data-tier="children"] .doodle-area{min-height:280px;}
+[data-tier="youth"] .doodle-area,[data-tier="adult"] .doodle-area{min-height:160px;}
+[data-tier="elderly"] .doodle-area{display:none;}
+.doodle-canvas{width:100%;height:100%;min-height:inherit;cursor:crosshair;display:block;}
+.doodle-tools{
+  display:flex;gap:8px;padding:10px 12px;border-top:1px solid var(--input-border);
+  background:var(--surface);transition:all 0.5s ease;
+}
+.doodle-tool{
+  width:calc(var(--touch-min) * 0.75);height:calc(var(--touch-min) * 0.75);
+  border-radius:50%;border:2px solid var(--border-base);cursor:pointer;
+  transition:all 0.2s ease;
+}
+.doodle-tool.active{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft);}
+/* Voice recorder */
+.voice-panel{margin-top:16px;padding:20px;background:var(--surface);border-radius:var(--radius);transition:all 0.5s ease;}
+.voice-wave{display:flex;align-items:center;justify-content:center;gap:3px;height:48px;margin-bottom:12px;}
+.voice-bar{
+  width:3px;border-radius:2px;background:var(--accent);
+  animation:waveBar 1.2s ease-in-out infinite;
+  transition:background 0.5s ease;
+}
+@keyframes waveBar{0%,100%{height:8px;opacity:0.4}50%{height:32px;opacity:1}}
+.voice-btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;padding:14px;border:none;border-radius:var(--radius);
+  background:var(--accent);color:#fff;font-size:var(--base-font-size);
+  font-weight:500;cursor:pointer;font-family:var(--font-main);
+  min-height:var(--touch-min);transition:all 0.3s ease;
+}
+.voice-btn:hover{opacity:0.9;}
+/* Emotion tags */
+.emotion-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;}
+.emotion-tag{
+  padding:8px 14px;border-radius:var(--radius);border:1.5px solid var(--border-base);
+  background:var(--surface);color:var(--text-main);font-size:calc(var(--base-font-size) * 0.85);
+  cursor:pointer;font-family:var(--font-main);transition:all 0.3s ease;
+  min-height:calc(var(--touch-min) * 0.8);
+}
+.emotion-tag:hover,.emotion-tag.selected{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-dark);}
+/* Elderly: read-aloud button */
+.read-aloud{
+  display:none;margin-top:16px;padding:16px;background:var(--accent);
+  border-radius:var(--radius);color:#fff;font-size:calc(var(--base-font-size) * 1.1);
+  font-weight:600;text-align:center;cursor:pointer;
+  min-height:var(--touch-min);font-family:var(--font-main);border:none;
+  box-shadow:var(--shadow-fab);transition:all 0.3s ease;
+}
+[data-tier="elderly"] .read-aloud{display:block;}
+/* Adult: white noise */
+.white-noise{
+  display:none;margin-top:16px;padding:14px;background:var(--surface);
+  border-radius:var(--radius);transition:all 0.5s ease;
+}
+[data-tier="adult"] .white-noise{display:block;}
+.noise-label{font-size:calc(var(--base-font-size) * 0.85);color:var(--text-sub);margin-bottom:8px;}
+.noise-btns{display:flex;gap:8px;}
+.noise-btn{
+  flex:1;padding:10px;border:1.5px solid var(--border-base);border-radius:var(--radius);
+  background:var(--bg);color:var(--text-main);font-size:calc(var(--base-font-size) * 0.85);
+  cursor:pointer;font-family:var(--font-main);min-height:var(--touch-min);
+  text-align:center;transition:all 0.3s ease;
+}
+.noise-btn:hover,.noise-btn.active{border-color:var(--accent);background:var(--accent-soft);}
+
+/* ============================================================
+   PAGE 3: SPROUTING TRANSITION
+   ============================================================ */
+.page-sprout{
+  display:none;opacity:0;
+  position:absolute;top:0;left:0;right:0;bottom:0;z-index:300;
+  background:var(--sprout-bg,var(--bg));
+  flex-direction:column;align-items:center;justify-content:center;
+  transition:background 0.5s ease;
+}
+.page-sprout.active{display:flex;opacity:1;}
+.sprout-svg{width:120px;height:180px;}
+.sprout-stem{
+  stroke:var(--accent);stroke-width:2.5;fill:none;
+  stroke-dasharray:200;stroke-dashoffset:200;
+}
+.sprout-leaf{fill:var(--accent);opacity:0;transform-origin:center bottom;}
+.sprout-seed{fill:var(--soil);}
+.page-sprout.active .sprout-stem{animation:stemGrow calc(2s / var(--motion-level,1)) ease forwards 0.5s;}
+.page-sprout.active .sprout-leaf{animation:leafGrow calc(1s / var(--motion-level,1)) ease forwards 1.8s;}
+@keyframes stemGrow{to{stroke-dashoffset:0}}
+@keyframes leafGrow{to{opacity:1;transform:scale(1)}}
+.sprout-text{
+  margin-top:24px;font-size:var(--base-font-size);color:var(--text-sub);
+  letter-spacing:0.1em;font-weight:300;
+}
+/* Ink ripple */
+.ink-ripple{
+  position:absolute;width:200px;height:200px;border-radius:50%;
+  border:1.5px solid rgba(var(--accent-rgb),0.2);
+  opacity:0;pointer-events:none;
+}
+.page-sprout.active .ink-ripple{
+  animation:rippleExpand calc(2.5s / var(--motion-level,1)) ease-out infinite;
+}
+.page-sprout.active .ink-ripple:nth-child(2){animation-delay:0.8s;}
+.page-sprout.active .ink-ripple:nth-child(3){animation-delay:1.6s;}
+@keyframes rippleExpand{
+  0%{transform:scale(0.3);opacity:0.6}
+  100%{transform:scale(2.5);opacity:0}
+}
+/* Sound wave */
+.sound-wave{display:flex;gap:4px;align-items:center;margin-top:20px;height:40px;}
+.sound-wave .bar{
+  width:3px;border-radius:2px;background:rgba(var(--accent-rgb),0.5);
+  animation:waveBar calc(1.2s / var(--motion-level,1)) ease-in-out infinite;
+}
+
+/* ============================================================
+   PAGE 4: ECHO CARD
+   ============================================================ */
+.echo-hero{
+  width:100%;height:200px;border-radius:0 0 var(--radius-lg) var(--radius-lg);
+  overflow:hidden;position:relative;
+}
+.echo-hero svg{width:100%;height:100%;}
+.echo-body{padding:24px 20px;}
+.echo-title{
+  font-size:calc(var(--base-font-size) * 1.5);font-weight:500;
+  font-family:var(--font-display);margin-bottom:16px;line-height:1.4;
+}
+.echo-narrative{
+  font-size:var(--base-font-size);line-height:1.9;color:var(--text-main);
+  margin-bottom:20px;
+}
+[data-tier="adult"] .echo-narrative{font-family:var(--font-display);line-height:2;}
+.echo-words{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;}
+.echo-word{
+  padding:6px 14px;border-radius:var(--radius);
+  background:var(--accent-soft);color:var(--accent-deep);
+  font-size:calc(var(--base-font-size) * 0.85);
+  transition:all 0.5s ease;
+}
+.echo-actions{display:flex;gap:12px;margin-top:24px;}
+.echo-action{
+  flex:1;padding:14px;border-radius:var(--radius);border:1.5px solid var(--border-base);
+  background:var(--surface);color:var(--text-main);font-size:var(--base-font-size);
+  cursor:pointer;font-family:var(--font-main);text-align:center;
+  min-height:var(--touch-min);transition:all 0.3s ease;
+}
+.echo-action:hover{border-color:var(--accent);}
+.echo-action.primary{background:var(--accent);color:#fff;border-color:var(--accent);}
+
+/* ============================================================
+   PAGE 5: TIME ARCHIVE
+   ============================================================ */
+.arch-header{
+  padding:16px 20px 12px;font-size:calc(var(--base-font-size) * 1.3);
+  font-weight:500;font-family:var(--font-display);
+}
+.arch-summary{
+  margin:0 20px 16px;padding:20px;background:var(--surface);
+  border-radius:var(--radius);box-shadow:var(--shadow-light);
+  transition:all 0.5s ease;
+}
+/* Adult: paper texture overlay */
+[data-tier="adult"] .arch-summary{
+  background:var(--parchment,#F8F4EC);
+  box-shadow:var(--shadow-light),inset 0 0 30px rgba(0,0,0,0.03);
+}
+.arch-stats{display:flex;justify-content:space-around;margin-bottom:16px;}
+.arch-stat{text-align:center;}
+.arch-stat__num{font-size:calc(var(--base-font-size) * 1.8);font-weight:600;color:var(--accent);font-family:var(--font-display);}
+.arch-stat__label{font-size:calc(var(--base-font-size) * 0.75);color:var(--text-sub);margin-top:2px;}
+.arch-keywords{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;}
+.arch-keyword{
+  font-size:calc(var(--base-font-size) * 0.85);padding:4px 12px;
+  border-radius:var(--radius);background:var(--accent-soft);color:var(--accent-deep);
+  transition:all 0.5s ease;
+}
+.arch-keyword:nth-child(2){font-size:calc(var(--base-font-size) * 1.1);}
+.arch-keyword:nth-child(4){font-size:calc(var(--base-font-size) * 0.75);}
+.arch-milestone{
+  margin:0 20px 16px;padding:16px;background:var(--surface);
+  border-radius:var(--radius);border-left:3px solid var(--accent);
+  transition:all 0.5s ease;
+}
+.arch-milestone__title{font-weight:500;margin-bottom:4px;}
+.arch-milestone__desc{font-size:calc(var(--base-font-size) * 0.85);color:var(--text-sub);line-height:1.6;}
+.arch-chart{
+  margin:0 20px;padding:20px;background:var(--surface);
+  border-radius:var(--radius);transition:all 0.5s ease;
+}
+.arch-chart__title{font-size:calc(var(--base-font-size) * 0.85);color:var(--text-sub);margin-bottom:12px;}
+.mini-chart{display:flex;align-items:flex-end;gap:6px;height:80px;}
+.mini-bar{
+  flex:1;border-radius:4px 4px 0 0;background:var(--accent);opacity:0.6;
+  transition:all 0.5s ease;
+}
+.mini-bar:nth-child(odd){opacity:0.8;}
+.mini-bar:nth-child(3){opacity:1;}
+
+/* ============================================================
+   TIER-SPECIFIC OVERRIDES
+   ============================================================ */
+/* Children: bigger doodle label */
+[data-tier="children"] .journal-tab[data-tab="doodle"]{font-weight:700;font-size:var(--base-font-size);}
+/* Children: star decorations on calendar */
+[data-tier="children"] .t-entry{border-left-width:4px;}
+/* Adult: paper texture on echo card */
+[data-tier="adult"] .echo-body{
+  background:linear-gradient(180deg,var(--parchment,#F8F4EC) 0%,var(--bg) 100%);
+}
+/* Elderly: larger nav icons */
+[data-tier="elderly"] .bnav-item svg{width:26px;height:26px;}
+[data-tier="elderly"] .bnav-item{font-size:13px;}
+/* Elderly: hidden doodle tab */
+[data-tier="elderly"] .journal-tab[data-tab="doodle"]{display:none;}
+/* Children: hidden long-text emphasis */
+[data-tier="children"] .journal-textarea{min-height:100px;}
+
+/* prefers-reduced-motion */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:0.01ms !important;transition-duration:0.01ms !important;}
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media(max-width:520px){
+  .shell-main{padding:0;}
+  .phone{border-radius:0;min-height:100vh;box-shadow:none;}
+  .tier-bar{padding:8px 12px;}
+  .tier-bar__info{display:none;}
+  .token-strip{padding:6px 12px;}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- ============================================================
+     TIER SWITCHER BAR
+     ============================================================ -->
+<header class="tier-bar">
+  <span class="tier-bar__label">分层预览</span>
+  <div class="tier-bar__tabs">
+    <button class="tier-tab active" data-set-tier="youth">青年清透</button>
+    <button class="tier-tab" data-set-tier="children">少儿奶柔</button>
+    <button class="tier-tab" data-set-tier="adult">成人哑光</button>
+    <button class="tier-tab" data-set-tier="elderly">适老康养</button>
+  </div>
+  <div class="tier-bar__info">
+    <strong id="tierName">青年清透版</strong>
+    <span id="tierDesc"> — 海盐薄荷 · 15px · 全动效</span>
+  </div>
+</header>
+
+<!-- TOKEN STRIP -->
+<div class="token-strip" id="tokenStrip"></div>
+
+<!-- MAIN -->
+<div class="shell-main">
+
+<!-- ============================================================
+     PHONE FRAME
+     ============================================================ -->
+<div class="phone" id="phone">
+
+<!-- Status Bar -->
+<div class="statusbar">
+  <span class="statusbar__time">21:37</span>
+  <div class="statusbar__icons">
+    <svg viewBox="0 0 16 12"><path d="M1 4.5C3.5 1.5 7 0 8 0s4.5 1.5 7 4.5"/><path d="M3 7C4.8 5.2 6.2 4.5 8 4.5S11.2 5.2 13 7"/><circle cx="8" cy="10" r="1.5"/></svg>
+    <svg viewBox="0 0 16 12"><rect x="1" y="1" width="12" height="10" rx="2" stroke="currentColor" fill="none" stroke-width="1.2"/><rect x="13.5" y="4" width="1.5" height="4" rx="0.5" fill="currentColor"/><rect x="2.5" y="2.5" width="7" height="7" rx="1" fill="currentColor" opacity="0.7"/></svg>
+  </div>
+</div>
+
+<!-- ======== PAGE 1: CALENDAR HOME ======== -->
+<div class="page active" id="page-calendar" data-component="Calendar Home">
+  <div class="cal-header">
+    <div class="cal-header__greeting">晚安，Monica</div>
+    <div class="cal-header__sub">今天是你记录的第 128 天</div>
+    <div class="cal-header__stats">
+      <span class="stat-chip">128 篇</span>
+      <span class="stat-chip">连续 47 天</span>
+      <span class="stat-chip">4 个阶段</span>
+    </div>
+  </div>
+  <div class="cal-month">2026 年 8 月 <span class="stage-badge" id="stageBadge">盛放期</span></div>
+  <div class="timeline">
+    <div class="t-entry" onclick="goSprout()">
+      <div class="t-entry__date"><span>周四</span><strong>02</strong></div>
+      <div class="t-entry__body">
+        <div class="t-entry__title">窗外的晚霞像打翻的调色盘</div>
+        <div class="t-entry__excerpt">晚自习结束走出教学楼，抬头看见天边层层叠叠的橘红和紫蓝，忍不住停下来画了几笔……</div>
+        <div class="t-entry__tags"><span class="tag">手绘</span><span class="tag">晚霞</span></div>
+      </div>
+    </div>
+    <div class="t-entry" onclick="goPage('page-journal')">
+      <div class="t-entry__date"><span>周三</span><strong>01</strong></div>
+      <div class="t-entry__body">
+        <div class="t-entry__title">备考日子里的安静时刻</div>
+        <div class="t-entry__excerpt">图书馆靠窗的位置刚好能看到银杏树，复习累了就看看叶子发呆，心里慢慢安定下来。</div>
+        <div class="t-entry__tags"><span class="tag">文字</span><span class="tag">独处</span></div>
+      </div>
+    </div>
+    <div class="t-entry" onclick="goPage('page-journal')">
+      <div class="t-entry__date"><span>周二</span><strong>31</strong></div>
+      <div class="t-entry__body">
+        <div class="t-entry__title">录了一段雨声</div>
+        <div class="t-entry__excerpt">午后的雨打在铁皮雨棚上，节奏忽快忽慢，像即兴的打击乐。录了三十秒反复听。</div>
+        <div class="t-entry__tags"><span class="tag">语音</span><span class="tag">雨声</span></div>
+      </div>
+    </div>
+    <div class="t-entry" onclick="goPage('page-journal')">
+      <div class="t-entry__date"><span>周一</span><strong>30</strong></div>
+      <div class="t-entry__body">
+        <div class="t-entry__title">和老朋友通了一个长电话</div>
+        <div class="t-entry__excerpt">聊到小时候一起爬树的事，笑起来的时候觉得时间好像没有走那么远。</div>
+        <div class="t-entry__tags"><span class="tag">语音</span><span class="tag">怀旧</span></div>
+      </div>
+    </div>
+    <div class="t-entry" onclick="goPage('page-journal')">
+      <div class="t-entry__date"><span>周日</span><strong>29</strong></div>
+      <div class="t-entry__body">
+        <div class="t-entry__title">给阳台的花画了一张速写</div>
+        <div class="t-entry__excerpt">茉莉开了第一朵，花瓣白得有点透明，用淡绿勾了叶子的脉络。</div>
+        <div class="t-entry__tags"><span class="tag">手绘</span><span class="tag">花</span></div>
+      </div>
+    </div>
+    <div class="t-entry" onclick="goPage('page-journal')">
+      <div class="t-entry__date"><span>周六</span><strong>28</strong></div>
+      <div class="t-entry__body">
+        <div class="t-entry__title">深夜写了一封没有寄出的信</div>
+        <div class="t-entry__excerpt">把想说的话写下来，写完觉得心里轻了很多。有些话不一定要说给谁听。</div>
+        <div class="t-entry__tags"><span class="tag">文字</span><span class="tag">深夜</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======== PAGE 2: JOURNAL ENTRY ======== -->
+<div class="page" id="page-journal" data-component="Journal Entry">
+  <div class="journal-tabs">
+    <button class="journal-tab active" data-tab="text">文字</button>
+    <button class="journal-tab" data-tab="voice">语音</button>
+    <button class="journal-tab" data-tab="doodle">涂鸦</button>
+    <button class="journal-tab" data-tab="photo">拍照</button>
+  </div>
+  <div class="journal-content">
+    <!-- Text tab (default) -->
+    <div id="tab-text">
+      <textarea class="journal-textarea" placeholder="今天有什么想记录的？一段文字、一个念头、一种感受……"></textarea>
+    </div>
+    <div class="emotion-tags">
+      <button class="emotion-tag">平静</button>
+      <button class="emotion-tag selected">温暖</button>
+      <button class="emotion-tag">感恩</button>
+      <button class="emotion-tag">释然</button>
+      <button class="emotion-tag">好奇</button>
+      <button class="emotion-tag">怀念</button>
+    </div>
+    <!-- Voice panel -->
+    <div class="voice-panel" id="tab-voice" style="display:none;">
+      <div class="voice-wave" id="voiceWave"></div>
+      <button class="voice-btn">按住录音</button>
+    </div>
+    <!-- Doodle area -->
+    <div class="doodle-area" id="tab-doodle" style="display:none;">
+      <canvas class="doodle-canvas" id="doodleCanvas"></canvas>
+      <div class="doodle-tools">
+        <div class="doodle-tool active" style="background:#4A3F35;" data-color="#4A3F35"></div>
+        <div class="doodle-tool" style="background:#8BC6A0;" data-color="#8BC6A0"></div>
+        <div class="doodle-tool" style="background:#E8A87C;" data-color="#E8A87C"></div>
+        <div class="doodle-tool" style="background:#8B7EB8;" data-color="#8B7EB8"></div>
+        <div class="doodle-tool" style="background:#F5A0B8;" data-color="#F5A0B8"></div>
+        <div class="doodle-tool" style="background:#B8D4E3;" data-color="#B8D4E3"></div>
+      </div>
+    </div>
+    <!-- Photo placeholder -->
+    <div id="tab-photo" style="display:none;text-align:center;padding:40px 0;">
+      <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+        <rect x="8" y="14" width="48" height="36" rx="6" stroke="var(--accent)" stroke-width="2"/>
+        <circle cx="32" cy="32" r="10" stroke="var(--accent)" stroke-width="2"/>
+        <circle cx="32" cy="32" r="5" fill="var(--accent-soft)"/>
+        <rect x="24" y="10" width="16" height="6" rx="3" fill="var(--accent-soft)"/>
+      </svg>
+      <p style="margin-top:12px;color:var(--text-sub);font-size:calc(var(--base-font-size) * 0.9);">点击拍照，记录此刻的风物</p>
+    </div>
+    <!-- White noise (adult only) -->
+    <div class="white-noise">
+      <div class="noise-label">伴随白噪音书写</div>
+      <div class="noise-btns">
+        <button class="noise-btn">晚风</button>
+        <button class="noise-btn active">流水</button>
+        <button class="noise-btn">白噪音</button>
+      </div>
+    </div>
+    <!-- Read aloud (elderly only) -->
+    <button class="read-aloud">朗读全文</button>
+    <!-- Submit / complete -->
+    <button class="voice-btn" style="margin-top:16px;background:var(--accent);" onclick="goSprout()">完成记录，种下一颗种子</button>
+  </div>
+</div>
+
+<!-- ======== PAGE 3: SPROUTING ======== -->
+<div class="page-sprout" id="page-sprout" data-component="Sprouting Transition">
+  <div style="position:relative;display:flex;align-items:center;justify-content:center;">
+    <div class="ink-ripple" style="position:absolute;"></div>
+    <div class="ink-ripple" style="position:absolute;"></div>
+    <div class="ink-ripple" style="position:absolute;"></div>
+    <svg class="sprout-svg" viewBox="0 0 120 180">
+      <!-- Seed -->
+      <ellipse class="sprout-seed" cx="60" cy="160" rx="14" ry="10"/>
+      <!-- Stem -->
+      <path class="sprout-stem" d="M60 160 Q58 120 60 80 Q62 60 58 40"/>
+      <!-- Leaves -->
+      <ellipse class="sprout-leaf" cx="48" cy="70" rx="16" ry="7" transform="rotate(-30 48 70)"/>
+      <ellipse class="sprout-leaf" cx="72" cy="55" rx="14" ry="6" transform="rotate(25 72 55)"/>
+      <!-- Top bud -->
+      <circle class="sprout-leaf" cx="58" cy="36" r="8" style="fill:var(--accent-soft);"/>
+    </svg>
+  </div>
+  <div class="sprout-text">种子正在发芽…</div>
+  <div class="sound-wave" id="soundWave"></div>
+</div>
+
+<!-- ======== PAGE 4: ECHO CARD ======== -->
+<div class="page" id="page-echo" data-component="Echo Card">
+  <div class="echo-hero">
+    <svg viewBox="0 0 430 200" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="var(--sunset-deep)"/>
+          <stop offset="40%" stop-color="var(--sunset-purple)"/>
+          <stop offset="70%" stop-color="var(--sunset-rose)"/>
+          <stop offset="100%" stop-color="var(--sunset-gold)"/>
+        </linearGradient>
+      </defs>
+      <rect width="430" height="200" fill="url(#skyGrad)"/>
+      <!-- Clouds -->
+      <ellipse cx="80" cy="60" rx="60" ry="18" fill="var(--twilight-cloud)" opacity="0.3"/>
+      <ellipse cx="300" cy="45" rx="80" ry="20" fill="var(--twilight-light)" opacity="0.25"/>
+      <ellipse cx="200" cy="80" rx="50" ry="14" fill="var(--twilight-cloud)" opacity="0.2"/>
+      <!-- Horizon -->
+      <rect y="155" width="430" height="45" fill="var(--illus-ground,var(--tree-green))" opacity="0.3"/>
+      <!-- Trees silhouette -->
+      <polygon points="40,155 50,120 60,155" fill="var(--tree-green)" opacity="0.5"/>
+      <polygon points="70,155 85,105 100,155" fill="var(--tree-green)" opacity="0.6"/>
+      <polygon points="340,155 355,115 370,155" fill="var(--tree-green)" opacity="0.5"/>
+      <polygon points="380,155 390,130 400,155" fill="var(--tree-green)" opacity="0.4"/>
+      <!-- Stars -->
+      <circle cx="150" cy="30" r="1.5" fill="var(--sunset-light)" opacity="0.8"/>
+      <circle cx="260" cy="20" r="1" fill="var(--sunset-light)" opacity="0.6"/>
+      <circle cx="350" cy="35" r="1.2" fill="var(--sunset-light)" opacity="0.7"/>
+      <circle cx="100" cy="25" r="0.8" fill="var(--sunset-light)" opacity="0.5"/>
+    </svg>
+  </div>
+  <div class="echo-body">
+    <div class="echo-title">晚霞里藏着今天的温柔</div>
+    <div class="echo-narrative">
+      你在傍晚记录了一段关于晚霞的手绘。橘红色的天空渐渐过渡到深蓝，
+      像是大自然在画布上随手泼了几笔颜料。那个时刻你站在教学楼下，
+      书包还压在肩上，但你选择停下来看——这本身就是一种温柔的勇气。
+      有些美好只在愿意停留的人面前展开。
+    </div>
+    <div class="echo-words">
+      <span class="echo-word">晚霞</span>
+      <span class="echo-word">手绘</span>
+      <span class="echo-word">安静</span>
+      <span class="echo-word">温柔</span>
+      <span class="echo-word">停留</span>
+    </div>
+    <div class="echo-actions">
+      <button class="echo-action" onclick="goPage('page-archive')">归档</button>
+      <button class="echo-action primary" onclick="goPage('page-calendar')">回到日历</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======== PAGE 5: TIME ARCHIVE ======== -->
+<div class="page" id="page-archive" data-component="Time Archive">
+  <div class="arch-header">时光档案馆</div>
+  <div class="arch-summary">
+    <div class="arch-stats">
+      <div class="arch-stat">
+        <div class="arch-stat__num">128</div>
+        <div class="arch-stat__label">总记录</div>
+      </div>
+      <div class="arch-stat">
+        <div class="arch-stat__num">47</div>
+        <div class="arch-stat__label">连续天数</div>
+      </div>
+      <div class="arch-stat">
+        <div class="arch-stat__num">4</div>
+        <div class="arch-stat__label">成长阶段</div>
+      </div>
+    </div>
+    <div class="arch-keywords">
+      <span class="arch-keyword">温暖</span>
+      <span class="arch-keyword">晚霞</span>
+      <span class="arch-keyword">平静</span>
+      <span class="arch-keyword">独处</span>
+      <span class="arch-keyword">感恩</span>
+      <span class="arch-keyword">雨声</span>
+      <span class="arch-keyword">怀旧</span>
+    </div>
+  </div>
+  <div class="arch-milestone">
+    <div class="arch-milestone__title">成长里程碑</div>
+    <div class="arch-milestone__desc">
+      你已走过嫩芽、花苞、盛放三个阶段。每一次记录都是一圈新的年轮，
+      那些看似平凡的日常，正在悄悄生长为你独一无二的生命纹理。
+    </div>
+  </div>
+  <div class="arch-chart">
+    <div class="arch-chart__title">本月记录趋势</div>
+    <div class="mini-chart" id="miniChart"></div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bnav" data-component="Bottom Navigation">
+  <button class="bnav-item active" data-nav="page-calendar">
+    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="3"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
+    <span>日历</span>
+  </button>
+  <button class="bnav-item" data-nav="page-journal">
+    <svg viewBox="0 0 24 24"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>
+    <span>记录</span>
+  </button>
+  <button class="bnav-item" data-nav="page-archive">
+    <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="5" rx="1"/><path d="M4 8v11a2 2 0 002 2h12a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+    <span>归档</span>
+  </button>
+</nav>
+
+<!-- FAB -->
+<button class="fab" onclick="goSprout()" aria-label="记录今日">+</button>
+
+</div><!-- .phone -->
+</div><!-- .shell-main -->
+</div><!-- .shell -->
+
+<script>
+/* ============================================================
+   TIER DATA
+   ============================================================ */
+const TIERS = {
+  youth:    { name:'青年清透版', desc:'海盐薄荷 · 15px · 全动效', stage:'盛放期', badge:'盛放期' },
+  children: { name:'少儿奶柔版', desc:'马卡龙暖柔 · 16px · 超大圆角', stage:'嫩芽期', badge:'嫩芽期' },
+  adult:    { name:'成人哑光版', desc:'宣纸檀棕 · 14px · 衬线文学', stage:'静木期', badge:'静木期' },
+  elderly:  { name:'适老康养版', desc:'浅茶大地 · 18px · 高对比', stage:'回响期', badge:'回响期' }
+};
+
+const TOKEN_KEYS = [
+  {key:'--bg',label:'底色'},{key:'--accent',label:'主色'},{key:'--accent-soft',label:'柔色'},
+  {key:'--text-main',label:'正文'},{key:'--text-sub',label:'辅文'},{key:'--border-base',label:'边框'},
+  {key:'--surface',label:'卡片面'},{key:'--radius',label:'圆角'}
+];
+
+/* ============================================================
+   TIER SWITCHING
+   ============================================================ */
+function setTier(tier) {
+  document.documentElement.setAttribute('data-tier', tier);
+  // Update tabs
+  document.querySelectorAll('.tier-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.setTier === tier);
+  });
+  // Update info
+  const info = TIERS[tier];
+  document.getElementById('tierName').textContent = info.name;
+  document.getElementById('tierDesc').textContent = ' — ' + info.desc;
+  document.getElementById('stageBadge').textContent = info.badge;
+  // Update token strip
+  updateTokenStrip();
+}
+
+function updateTokenStrip() {
+  const cs = getComputedStyle(document.documentElement);
+  const strip = document.getElementById('tokenStrip');
+  strip.innerHTML = TOKEN_KEYS.map(t => {
+    const val = cs.getPropertyValue(t.key).trim();
+    const isColor = val.startsWith('#') || val.startsWith('rgb');
+    return `<div class="token-chip">
+      ${isColor ? `<div class="token-chip__swatch" style="background:${val}"></div>` : ''}
+      <span>${t.label}: <strong style="color:var(--shell-fg)">${val || '—'}</strong></span>
+    </div>`;
+  }).join('');
+}
+
+/* ============================================================
+   PAGE NAVIGATION
+   ============================================================ */
+function goPage(id) {
+  // Hide sprouting page
+  document.getElementById('page-sprout').classList.remove('active');
+  // Hide all pages
+  document.querySelectorAll('.page').forEach(p => { p.classList.remove('active'); });
+  // Show target
+  const target = document.getElementById(id);
+  if (target) {
+    target.classList.add('active');
+  }
+  // Update nav
+  document.querySelectorAll('.bnav-item').forEach(n => {
+    n.classList.toggle('active', n.dataset.nav === id);
+  });
+}
+
+/* Sprouting trigger */
+function goSprout() {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const sp = document.getElementById('page-sprout');
+  sp.classList.remove('active');
+  // Force reflow to restart animations
+  void sp.offsetWidth;
+  sp.classList.add('active');
+  // Auto-advance after 3-5s based on motion level
+  const ml = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--motion-level') || 1);
+  const delay = Math.round(3000 / ml);
+  setTimeout(() => {
+    sp.classList.remove('active');
+    goPage('page-echo');
+  }, Math.min(delay, 6000));
+}
+
+/* ============================================================
+   JOURNAL TABS
+   ============================================================ */
+document.querySelectorAll('.journal-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.journal-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    const t = tab.dataset.tab;
+    document.getElementById('tab-text').style.display = t === 'text' ? '' : 'none';
+    document.getElementById('tab-voice').style.display = t === 'voice' ? '' : 'none';
+    document.getElementById('tab-doodle').style.display = t === 'doodle' ? '' : 'none';
+    document.getElementById('tab-photo').style.display = t === 'photo' ? '' : 'none';
+    if (t === 'doodle') initDoodle();
+  });
+});
+
+/* Emotion tag toggle */
+document.querySelectorAll('.emotion-tag').forEach(tag => {
+  tag.addEventListener('click', () => tag.classList.toggle('selected'));
+});
+
+/* Noise btn toggle */
+document.querySelectorAll('.noise-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.noise-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+
+/* ============================================================
+   DOODLE CANVAS
+   ============================================================ */
+let doodleCtx = null, doodleInited = false, doodleColor = '#4A3F35';
+function initDoodle() {
+  if (doodleInited) return;
+  const canvas = document.getElementById('doodleCanvas');
+  const rect = canvas.parentElement.getBoundingClientRect();
+  canvas.width = rect.width;
+  canvas.height = rect.height - 50;
+  doodleCtx = canvas.getContext('2d');
+  doodleCtx.lineCap = 'round';
+  doodleCtx.lineWidth = 3;
+  let drawing = false;
+  function pos(e) {
+    const r = canvas.getBoundingClientRect();
+    const t = e.touches ? e.touches[0] : e;
+    return { x: t.clientX - r.left, y: t.clientY - r.top };
+  }
+  function start(e) { e.preventDefault(); drawing = true; const p = pos(e); doodleCtx.beginPath(); doodleCtx.moveTo(p.x, p.y); }
+  function move(e) { if (!drawing) return; e.preventDefault(); const p = pos(e); doodleCtx.strokeStyle = doodleColor; doodleCtx.lineTo(p.x, p.y); doodleCtx.stroke(); }
+  function end() { drawing = false; }
+  canvas.addEventListener('mousedown', start); canvas.addEventListener('mousemove', move); canvas.addEventListener('mouseup', end); canvas.addEventListener('mouseleave', end);
+  canvas.addEventListener('touchstart', start, {passive:false}); canvas.addEventListener('touchmove', move, {passive:false}); canvas.addEventListener('touchend', end);
+  doodleInited = true;
+}
+document.querySelectorAll('.doodle-tool').forEach(tool => {
+  tool.addEventListener('click', () => {
+    document.querySelectorAll('.doodle-tool').forEach(t => t.classList.remove('active'));
+    tool.classList.add('active');
+    doodleColor = tool.dataset.color;
+  });
+});
+
+/* ============================================================
+   VOICE WAVE BARS
+   ============================================================ */
+(function(){
+  const wave = document.getElementById('voiceWave');
+  for (let i = 0; i < 20; i++) {
+    const bar = document.createElement('div');
+    bar.className = 'voice-bar';
+    bar.style.animationDelay = (i * 0.06) + 's';
+    wave.appendChild(bar);
+  }
+})();
+
+/* ============================================================
+   SOUND WAVE BARS (Sprout page)
+   ============================================================ */
+(function(){
+  const sw = document.getElementById('soundWave');
+  for (let i = 0; i < 16; i++) {
+    const bar = document.createElement('div');
+    bar.className = 'bar';
+    bar.style.height = (8 + Math.random() * 24) + 'px';
+    bar.style.animationDelay = (i * 0.08) + 's';
+    sw.appendChild(bar);
+  }
+})();
+
+/* ============================================================
+   MINI CHART BARS
+   ============================================================ */
+(function(){
+  const chart = document.getElementById('miniChart');
+  const data = [40,55,30,70,60,85,45,65,50,75,35,80,60,90,55,70,45,65,50,80];
+  data.forEach(h => {
+    const bar = document.createElement('div');
+    bar.className = 'mini-bar';
+    bar.style.height = h + '%';
+    chart.appendChild(bar);
+  });
+})();
+
+/* ============================================================
+   EVENT BINDINGS
+   ============================================================ */
+document.querySelectorAll('.tier-tab').forEach(tab => {
+  tab.addEventListener('click', () => setTier(tab.dataset.setTier));
+});
+
+document.querySelectorAll('.bnav-item').forEach(nav => {
+  nav.addEventListener('click', () => goPage(nav.dataset.nav));
+});
+
+// Double-click a timeline entry to trigger sprouting demo
+document.querySelectorAll('.t-entry').forEach((entry, i) => {
+  if (i === 0) {
+    const hint = document.createElement('div');
+    hint.style.cssText = 'font-size:11px;color:var(--text-sub);padding:4px 20px 16px;opacity:0.7;';
+    hint.textContent = '点击条目进入编辑 · 点击首条体验发芽动画';
+    entry.parentElement.insertBefore(hint, entry.nextSibling);
+  }
+});
+
+// Initial token strip
+updateTokenStrip();
+</script>
+</body>
+</html>

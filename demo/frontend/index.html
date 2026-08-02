@@ -1,0 +1,1773 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="canvas:aspect-ratio" content="9:16">
+<title>聲畫合鳴 Echo & Etch — 成长日志</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700&family=Noto+Sans+SC:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ===== TOKENS ===== */
+:root {
+  --font-display: 'Noto Serif SC', 'Songti SC', serif;
+  --font-body: 'Noto Sans SC', -apple-system, 'PingFang SC', sans-serif;
+  --bg-page: #FAF7F3;
+  --bg-surface: #FFFFFF;
+  --bg-input: #F5F1EC;
+  --text-primary: #4A3F35;
+  --text-secondary: #8A7E72;
+  --text-muted: #B5ADA4;
+  --accent: #7DB88A;
+  --accent-soft: rgba(125,184,138,0.1);
+  --accent-hover: #6DAA7A;
+  --warm-gold: #B8A08A;
+  --warm-gold-soft: rgba(184,160,138,0.1);
+  --border: rgba(74,63,53,0.08);
+  --border-strong: rgba(74,63,53,0.15);
+  --shadow-sm: 0 2px 8px rgba(74,63,53,0.05);
+  --shadow-md: 0 4px 16px rgba(74,63,53,0.07);
+  --shadow-float: 0 8px 32px rgba(74,63,53,0.1);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-pill: 999px;
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --duration: 0.35s;
+  --entry-gap: 12px;
+  /* Stage accent tokens */
+  --stage-sprout: #E8B4BC;
+  --stage-sprout-soft: rgba(232,180,188,0.1);
+  --stage-bud: #8CCBB8;
+  --stage-bud-soft: rgba(140,203,184,0.1);
+  --stage-bloom: #C4A882;
+  --stage-bloom-soft: rgba(196,168,130,0.1);
+  --stage-wood: #8BAA8F;
+  --stage-wood-soft: rgba(139,170,143,0.12);
+  /* Illustration palette */
+  --illus-moon: #E8DFD0;
+  --illus-moon-glow: #F5E8D4;
+  --illus-soil: #8B7355;
+  --illus-soil-light: #A6926E;
+  --illus-ink: #4A3F35;
+  --illus-wave: #7DB88A;
+  --illus-sky-day: #D4E4DC;
+  --illus-garden: #B8D4A8;
+  --illus-autumn: #D4A878;
+  --illus-ocean: #9CB8C8;
+  --illus-night: #2D3040;
+  --illus-star: #F5E8D4;
+  --illus-petal: #E8C4C8;
+  --illus-leaf: #7DB88A;
+  --illus-leaf-dark: #5A9068;
+  --illus-water: #A8C8D4;
+  --illus-sun: #F0D8A0;
+  --illus-cloud: #E8E0D4;
+  --illus-bark: #A09484;
+  --illus-white: #FFFFFF;
+}
+
+/* ===== RESET ===== */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { font-size: 16px; }
+body {
+  font-family: var(--font-body);
+  font-weight: 400;
+  color: var(--text-primary);
+  background: var(--bg-page);
+  line-height: 1.5;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== LAYOUT ===== */
+.device {
+  width: 100%; height: 100dvh;
+  max-width: 430px; margin: 0 auto;
+  position: relative; overflow: hidden;
+  background: var(--bg-page);
+}
+@media (min-width: 431px) {
+  body { background: #EDE8E0; display: flex; align-items: center; justify-content: center; }
+  .device { height: min(920px, 100dvh); box-shadow: var(--shadow-float); }
+}
+
+/* ===== SCREENS ===== */
+main { flex: 1; position: relative; overflow: hidden; }
+.screen {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  opacity: 0; pointer-events: none;
+  transition: opacity var(--duration) var(--ease), transform var(--duration) var(--ease);
+  transform: translateY(10px);
+  overflow-y: auto; overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+.screen.active { opacity: 1; pointer-events: auto; transform: translateY(0); z-index: 10; }
+.screen::-webkit-scrollbar { display: none; }
+
+/* ===== CALENDAR HOME ===== */
+[data-component="Calendar Home"] { background: var(--bg-page); }
+.cal-header {
+  padding: 52px 20px 16px; flex-shrink: 0;
+}
+.cal-greeting {
+  display: flex; align-items: flex-start; justify-content: space-between;
+}
+.cal-greeting h1 {
+  font-family: var(--font-display);
+  font-size: 24px; font-weight: 700;
+  letter-spacing: -0.02em; color: var(--text-primary);
+  line-height: 1.3;
+}
+.cal-greeting .sub {
+  font-size: 13px; color: var(--text-secondary);
+  margin-top: 4px; line-height: 1.5;
+}
+.stage-badge {
+  display: flex; align-items: center; gap: 6px;
+  padding: 5px 12px;
+  background: var(--accent-soft);
+  border-radius: var(--radius-pill);
+  flex-shrink: 0;
+}
+.stage-badge svg { width: 14px; height: 14px; color: var(--accent); }
+.stage-badge span { font-size: 11px; font-weight: 500; color: var(--accent); }
+
+.cal-stats {
+  display: flex; gap: 16px; margin-top: 14px;
+  padding: 12px 16px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+.cal-stat {
+  flex: 1; text-align: center;
+}
+.cal-stat .num {
+  font-family: var(--font-display);
+  font-size: 20px; font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+.cal-stat .label {
+  font-size: 11px; color: var(--text-muted);
+  margin-top: 2px;
+}
+.cal-stat + .cal-stat {
+  border-left: 1px solid var(--border);
+  padding-left: 16px;
+}
+
+/* Timeline */
+.timeline {
+  flex: 1; padding: 8px 20px 100px;
+  overflow-y: auto;
+}
+.timeline::-webkit-scrollbar { display: none; }
+.timeline-month {
+  margin-bottom: 24px;
+}
+.timeline-month-label {
+  font-family: var(--font-display);
+  font-size: 14px; font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: 0.02em;
+  margin-bottom: 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.timeline-month-label::after {
+  content: ''; flex: 1; height: 1px;
+  background: var(--border);
+}
+.timeline-entry {
+  display: flex; gap: 12px;
+  padding: 12px;
+  margin-bottom: var(--entry-gap);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all 0.25s var(--ease);
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
+}
+.timeline-entry:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+.timeline-entry:active { transform: translateY(0); }
+
+/* Stage-specific left border accent */
+.timeline-entry[data-stage="sprout"] { border-left: 3px solid var(--stage-sprout); }
+.timeline-entry[data-stage="bud"] { border-left: 3px solid var(--stage-bud); }
+.timeline-entry[data-stage="bloom"] { border-left: 3px solid var(--stage-bloom); }
+.timeline-entry[data-stage="wood"] { border-left: 3px solid var(--stage-wood); }
+.timeline-entry[data-stage="wood"] .entry-text .title,
+.timeline-entry[data-stage="wood"] .entry-text .excerpt { font-size: calc(1em * 1.12); }
+
+.entry-thumb {
+  width: 52px; height: 52px;
+  border-radius: var(--radius-md);
+  overflow: hidden; flex-shrink: 0;
+}
+.entry-thumb svg { width: 100%; height: 100%; }
+.entry-body {
+  flex: 1; min-width: 0;
+  display: flex; flex-direction: column; justify-content: center;
+}
+.entry-meta {
+  display: flex; align-items: center; gap: 6px;
+  margin-bottom: 4px;
+}
+.entry-date {
+  font-size: 12px; color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.entry-stage {
+  font-size: 10px; font-weight: 500;
+  padding: 1px 6px;
+  border-radius: var(--radius-pill);
+  line-height: 1.6;
+}
+.entry-stage[data-s="sprout"] { background: var(--stage-sprout-soft); color: var(--stage-sprout); }
+.entry-stage[data-s="bud"] { background: var(--stage-bud-soft); color: var(--stage-bud); }
+.entry-stage[data-s="bloom"] { background: var(--stage-bloom-soft); color: var(--stage-bloom); }
+.entry-stage[data-s="wood"] { background: var(--stage-wood-soft); color: var(--stage-wood); }
+.entry-text .title {
+  font-family: var(--font-display);
+  font-size: 14px; font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.entry-text .excerpt {
+  font-size: 12px; color: var(--text-secondary);
+  margin-top: 2px; line-height: 1.5;
+  display: -webkit-box; -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical; overflow: hidden;
+}
+
+/* FAB Button */
+.fab {
+  position: absolute;
+  bottom: 84px; right: 20px;
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--illus-white);
+  border: none;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 16px rgba(125,184,138,0.3);
+  cursor: pointer;
+  transition: all 0.25s var(--ease);
+  z-index: 50;
+  -webkit-tap-highlight-color: transparent;
+}
+.fab:hover { background: var(--accent-hover); transform: translateY(-2px); box-shadow: 0 6px 24px rgba(125,184,138,0.35); }
+.fab:active { transform: translateY(0); }
+.fab svg { width: 24px; height: 24px; }
+
+/* ===== JOURNAL ENTRY ===== */
+[data-component="Journal Entry"] { background: var(--bg-page); }
+.journal-header {
+  padding: 52px 20px 12px;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0;
+}
+.journal-date {
+  font-family: var(--font-display);
+  font-size: 18px; font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+.journal-stage {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 12px; color: var(--text-secondary);
+}
+.journal-stage svg { width: 14px; height: 14px; color: var(--accent); }
+
+.journal-body {
+  flex: 1; padding: 0 20px;
+  display: flex; flex-direction: column;
+  overflow-y: auto;
+}
+.journal-body::-webkit-scrollbar { display: none; }
+.journal-prompt {
+  font-size: 14px; color: var(--text-secondary);
+  margin-bottom: 16px; line-height: 1.6;
+  font-style: italic;
+}
+
+/* Input tabs */
+.j-tabs {
+  display: flex; gap: 3px;
+  padding: 3px;
+  background: var(--bg-input);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px; flex-shrink: 0;
+}
+.j-tab {
+  flex: 1; display: flex; align-items: center; justify-content: center; gap: 5px;
+  padding: 9px 6px;
+  border: none; background: transparent;
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: 13px; font-weight: 500;
+  border-radius: calc(var(--radius-lg) - 3px);
+  cursor: pointer; transition: all 0.25s var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+.j-tab svg { width: 15px; height: 15px; }
+.j-tab.active {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Input panels */
+.j-panels { flex: 1; position: relative; min-height: 180px; }
+.j-panel {
+  position: absolute; inset: 0;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.25s var(--ease);
+  display: flex; flex-direction: column;
+}
+.j-panel.active { opacity: 1; pointer-events: auto; }
+
+/* Text */
+.j-textarea {
+  width: 100%; height: 100%; min-height: 150px;
+  padding: 16px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 15px; line-height: 1.7;
+  resize: none; outline: none;
+  transition: border-color 0.25s var(--ease);
+}
+.j-textarea::placeholder { color: var(--text-muted); }
+.j-textarea:focus { border-color: var(--accent); }
+
+/* Voice */
+.voice-area {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 18px;
+}
+.voice-orb {
+  width: 100px; height: 100px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; position: relative;
+  transition: all 0.3s var(--ease);
+}
+.voice-orb::after {
+  content: ''; position: absolute; inset: -6px;
+  border-radius: 50%; border: 1.5px solid var(--accent);
+  opacity: 0; transition: opacity 0.3s var(--ease);
+}
+.voice-orb.recording::after { opacity: 1; animation: pulseRing 1.5s var(--ease) infinite; }
+.voice-orb svg { width: 32px; height: 32px; color: var(--accent); }
+.voice-status { font-size: 14px; color: var(--text-secondary); }
+.voice-timer {
+  font-family: var(--font-display);
+  font-size: 28px; font-weight: 600;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+.voice-bars {
+  display: flex; align-items: center; justify-content: center;
+  gap: 2px; height: 32px; opacity: 0; transition: opacity 0.3s var(--ease);
+}
+.voice-bars.on { opacity: 1; }
+.voice-bars .bar {
+  width: 2.5px; background: var(--accent);
+  border-radius: 2px; transition: height 0.1s ease;
+}
+
+/* Photo */
+.photo-area { gap: 12px; padding: 4px 0; }
+.photo-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
+}
+.photo-cell {
+  aspect-ratio: 1; border-radius: var(--radius-md);
+  overflow: hidden; cursor: pointer;
+  transition: transform 0.2s var(--ease);
+}
+.photo-cell:hover { transform: scale(0.97); }
+.photo-cell svg { width: 100%; height: 100%; }
+.photo-cell img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.photo-cell.selected { outline: 2px solid var(--accent); outline-offset: -2px; }
+.photo-add {
+  aspect-ratio: 1;
+  border: 1.5px dashed var(--border-strong);
+  border-radius: var(--radius-md);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 4px;
+  cursor: pointer; color: var(--text-muted);
+  transition: all 0.25s var(--ease);
+}
+.photo-add:hover { border-color: var(--accent); color: var(--accent); }
+.photo-add svg { width: 24px; height: 24px; }
+.photo-add span { font-size: 11px; }
+
+/* Doodle */
+.doodle-area { gap: 10px; }
+.doodle-wrap {
+  flex: 1; border-radius: var(--radius-lg);
+  overflow: hidden; border: 1px solid var(--border);
+  background: var(--bg-input); position: relative;
+}
+.doodle-wrap canvas { width: 100%; height: 100%; cursor: crosshair; }
+.doodle-tools { display: flex; align-items: center; gap: 6px; }
+.d-color {
+  width: 24px; height: 24px; border-radius: 50%;
+  border: 2px solid transparent; cursor: pointer;
+  transition: all 0.2s var(--ease);
+}
+.d-color.active { border-color: var(--text-primary); transform: scale(1.15); }
+.d-clear {
+  margin-left: auto; padding: 5px 12px;
+  background: transparent; border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  color: var(--text-secondary); font-size: 12px;
+  font-family: var(--font-body); cursor: pointer;
+  transition: all 0.2s var(--ease);
+}
+.d-clear:hover { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); }
+
+/* Generate bar */
+.gen-bar {
+  padding: 14px 20px 92px; flex-shrink: 0;
+}
+.gen-btn {
+  width: 100%; padding: 15px;
+  background: var(--accent); color: var(--illus-white);
+  border: none; border-radius: var(--radius-lg);
+  font-family: var(--font-display);
+  font-size: 16px; font-weight: 600;
+  letter-spacing: 0.02em; cursor: pointer;
+  transition: all 0.25s var(--ease);
+  box-shadow: 0 4px 16px rgba(125,184,138,0.25);
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  -webkit-tap-highlight-color: transparent;
+}
+.gen-btn svg { width: 18px; height: 18px; }
+.gen-btn:hover { background: var(--accent-hover); transform: translateY(-1px); }
+.gen-btn:active { transform: translateY(1px); }
+
+/* ===== SPROUTING (Generating) ===== */
+[data-component="Sprouting"] {
+  align-items: center; justify-content: center;
+  background: var(--bg-page); gap: 0;
+}
+.sprout-phase {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  opacity: 0; transition: opacity 0.8s var(--ease);
+  padding: 40px 32px;
+}
+.sprout-phase.active { opacity: 1; }
+
+/* Phase 1: Seed sprout */
+.sprout-svg { width: 120px; height: 160px; }
+.sprout-stem { stroke-dasharray: 60; stroke-dashoffset: 60; }
+.sprout-phase.active .sprout-stem { animation: drawLine 1.5s var(--ease) 0.3s forwards; }
+.sprout-leaf-l, .sprout-leaf-r { opacity: 0; transform-origin: bottom center; }
+.sprout-phase.active .sprout-leaf-l { animation: leafGrow 1s var(--ease) 1.2s forwards; }
+.sprout-phase.active .sprout-leaf-r { animation: leafGrow 1s var(--ease) 1.5s forwards; }
+
+/* Phase 2: Ink spreading */
+.ink-svg { width: 200px; height: 200px; }
+.ink-ring { opacity: 0; }
+.sprout-phase.active .ink-ring-1 { animation: inkSpread 2s var(--ease-out) forwards; }
+.sprout-phase.active .ink-ring-2 { animation: inkSpread 2s var(--ease-out) 0.4s forwards; }
+.sprout-phase.active .ink-ring-3 { animation: inkSpread 2s var(--ease-out) 0.8s forwards; }
+
+/* Phase 3: Sound waves */
+.wave-svg { width: 200px; height: 200px; }
+.wave-circle { opacity: 0; }
+.sprout-phase.active .wave-c1 { animation: waveRipple 2s var(--ease-out) forwards; }
+.sprout-phase.active .wave-c2 { animation: waveRipple 2s var(--ease-out) 0.3s forwards; }
+.sprout-phase.active .wave-c3 { animation: waveRipple 2s var(--ease-out) 0.6s forwards; }
+.sprout-phase.active .wave-c4 { animation: waveRipple 2s var(--ease-out) 0.9s forwards; }
+
+.sprout-label {
+  font-size: 14px; color: var(--text-secondary);
+  margin-top: 24px; letter-spacing: 0.02em;
+  text-align: center; line-height: 1.6;
+}
+/* Phase 2: 叙事文字逐字弹出 */
+.gen-narrative {
+  font-family: var(--tier-display);
+  font-size: 17px; font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.8; text-align: center;
+  letter-spacing: -0.01em;
+  max-width: 300px; margin-top: 16px;
+  min-height: 1.8em;
+}
+.gen-narrative .char {
+  opacity: 0; display: inline-block;
+  animation: charAppear 0.3s var(--ease) forwards;
+}
+@keyframes charAppear {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+/* Phase 3: 音频波形柱状图 */
+.gen-waveform-wrap {
+  display: flex; align-items: center; justify-content: center;
+  gap: 2px; height: 48px; width: 260px; margin-top: 16px;
+}
+.gen-waveform-wrap .bar {
+  width: 3px; background: var(--tier-accent, var(--accent));
+  border-radius: 2px;
+  animation: waveBar 0.7s var(--ease) infinite alternate;
+}
+@keyframes waveBar {
+  from { height: 4px; }
+  to { height: var(--h, 24px); }
+}
+
+/* ===== ECHO CARD ===== */
+[data-component="Echo Card"] { background: var(--bg-page); }
+.echo-view {
+  flex: 1; padding: 16px; padding-top: 52px; padding-bottom: 76px;
+  display: flex; flex-direction: column; gap: 12px;
+  overflow-y: auto; -webkit-overflow-scrolling: touch;
+}
+.echo-view::-webkit-scrollbar { display: none; }
+.echo-hero {
+  width: 100%; aspect-ratio: 16/9; max-height: 180px;
+  border-radius: var(--radius-xl);
+  overflow: hidden; position: relative;
+  flex-shrink: 0;
+}
+.echo-hero svg, .echo-hero img { width: 100%; height: 100%; object-fit: cover; }
+.echo-hero svg { width: 100%; height: 100%; }
+.echo-hero-overlay {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 18px;
+  background: linear-gradient(transparent, rgba(45,48,64,0.6));
+}
+.echo-hero-date {
+  font-size: 12px; color: rgba(255,255,255,0.75);
+  display: flex; align-items: center; gap: 6px;
+}
+.echo-hero-title {
+  font-family: var(--font-display);
+  font-size: 19px; font-weight: 600;
+  color: var(--illus-white);
+  letter-spacing: -0.01em; margin-top: 4px; line-height: 1.3;
+}
+.echo-player {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 12px;
+  display: flex; flex-direction: column; gap: 8px;
+  flex-shrink: 0;
+}
+.player-row { display: flex; align-items: center; gap: 10px; }
+.play-btn {
+  width: 40px; height: 40px;
+  border-radius: 50%; background: var(--accent);
+  border: none; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--illus-white); flex-shrink: 0;
+  transition: all 0.2s var(--ease);
+}
+.play-btn:hover { background: var(--accent-hover); }
+.play-btn svg { width: 16px; height: 16px; }
+.player-info { flex: 1; min-width: 0; }
+.player-info .ptitle { font-size: 13px; font-weight: 500; color: var(--text-primary); }
+.player-info .pdur { font-size: 11px; color: var(--text-muted); margin-top: 1px; font-variant-numeric: tabular-nums; }
+.p-wave {
+  display: flex; align-items: center; gap: 1.5px; height: 28px;
+}
+.p-wave .bar {
+  width: 2px; background: var(--accent); border-radius: 2px;
+  opacity: 0.35; transition: opacity 0.15s ease;
+}
+.p-wave .bar.on { opacity: 1; }
+.p-progress {
+  height: 3px; background: var(--border);
+  border-radius: 2px; cursor: pointer;
+}
+.p-progress-fill {
+  height: 100%; background: var(--accent);
+  border-radius: 2px; width: 0%;
+  transition: width 0.3s linear;
+}
+.p-time {
+  display: flex; justify-content: space-between;
+  font-size: 11px; color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.echo-narrative {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  flex: 1 0 auto; min-height: 120px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.echo-narrative::-webkit-scrollbar { display: none; }
+.echo-narrative p {
+  font-family: var(--font-display);
+  font-size: 15px; font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.85; letter-spacing: -0.01em;
+}
+.echo-tags {
+  display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap;
+}
+.echo-tag {
+  padding: 3px 10px;
+  background: var(--accent-soft);
+  border-radius: var(--radius-pill);
+  font-size: 11px; color: var(--accent);
+  font-weight: 500;
+}
+.echo-tag.gold { background: var(--warm-gold-soft); color: var(--warm-gold); }
+.echo-actions {
+  display: flex; gap: 8px; flex-shrink: 0;
+}
+.echo-act {
+  flex: 1; display: flex; align-items: center; justify-content: center; gap: 5px;
+  padding: 12px;
+  background: var(--bg-surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  color: var(--text-secondary); font-family: var(--font-body);
+  font-size: 13px; font-weight: 500; cursor: pointer;
+  transition: all 0.2s var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+.echo-act:hover { border-color: var(--accent); color: var(--accent); }
+.echo-act svg { width: 15px; height: 15px; }
+.echo-act.primary {
+  background: var(--accent); color: var(--illus-white); border-color: var(--accent);
+}
+.echo-act.primary:hover { background: var(--accent-hover); }
+
+/* ===== GROWTH ARCHIVE ===== */
+[data-component="Growth Archive"] { background: var(--bg-page); }
+.arch-header {
+  padding: 52px 20px 12px; flex-shrink: 0;
+}
+.arch-header h2 {
+  font-family: var(--font-display);
+  font-size: 22px; font-weight: 700;
+  letter-spacing: -0.02em; color: var(--text-primary);
+}
+.arch-overview {
+  display: flex; gap: 8px; margin-top: 14px;
+}
+.arch-stat {
+  flex: 1; padding: 12px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  text-align: center;
+}
+.arch-stat .num {
+  font-family: var(--font-display);
+  font-size: 22px; font-weight: 700;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums; line-height: 1.2;
+}
+.arch-stat .label {
+  font-size: 11px; color: var(--text-muted); margin-top: 2px;
+}
+.arch-body {
+  flex: 1; padding: 16px 20px 100px;
+  display: flex; flex-direction: column; gap: var(--entry-gap);
+  overflow-y: auto;
+}
+.arch-body::-webkit-scrollbar { display: none; }
+.arch-entry {
+  display: flex; gap: 10px;
+  padding: 10px 12px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+.arch-entry:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+.arch-entry[data-stage="sprout"] { border-left: 3px solid var(--stage-sprout); }
+.arch-entry[data-stage="bud"] { border-left: 3px solid var(--stage-bud); }
+.arch-entry[data-stage="bloom"] { border-left: 3px solid var(--stage-bloom); }
+.arch-entry[data-stage="wood"] { border-left: 3px solid var(--stage-wood); }
+.arch-thumb {
+  width: 44px; height: 44px;
+  border-radius: var(--radius-sm);
+  overflow: hidden; flex-shrink: 0;
+}
+.arch-thumb svg { width: 100%; height: 100%; }
+.arch-info { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; }
+.arch-info .atitle {
+  font-family: var(--font-display);
+  font-size: 14px; font-weight: 600;
+  color: var(--text-primary); line-height: 1.3;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.arch-info .ameta {
+  font-size: 11px; color: var(--text-muted); margin-top: 3px;
+  display: flex; gap: 6px; align-items: center;
+}
+
+/* Growth summary card */
+.growth-summary {
+  margin-top: 12px;
+  padding: 18px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+}
+.growth-summary h3 {
+  font-family: var(--font-display);
+  font-size: 16px; font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.01em; margin-bottom: 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.growth-summary h3 svg { width: 18px; height: 18px; color: var(--accent); }
+.growth-keywords {
+  display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px;
+}
+.growth-kw {
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 12px; font-weight: 500;
+}
+.growth-kw:nth-child(1) { background: var(--accent-soft); color: var(--accent); font-size: 14px; }
+.growth-kw:nth-child(2) { background: var(--warm-gold-soft); color: var(--warm-gold); font-size: 13px; }
+.growth-kw:nth-child(3) { background: var(--stage-bud-soft); color: var(--stage-bud); }
+.growth-kw:nth-child(4) { background: var(--stage-sprout-soft); color: var(--stage-sprout); }
+.growth-kw:nth-child(5) { background: rgba(184,160,138,0.08); color: var(--text-secondary); }
+.growth-milestone {
+  padding: 12px; background: var(--bg-input);
+  border-radius: var(--radius-md);
+}
+.growth-milestone p {
+  font-size: 13px; color: var(--text-secondary); line-height: 1.6;
+}
+.growth-milestone strong { color: var(--text-primary); font-weight: 600; }
+
+/* ===== BOTTOM NAV ===== */
+.bnav {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 68px;
+  background: rgba(250,247,243,0.94);
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-around;
+  padding-bottom: 6px; z-index: 100;
+}
+.bnav-item {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 8px 20px; cursor: pointer;
+  color: var(--text-muted); transition: color 0.2s var(--ease);
+  border: none; background: none; font-family: var(--font-body);
+  -webkit-tap-highlight-color: transparent;
+}
+.bnav-item svg { width: 22px; height: 22px; }
+.bnav-item span { font-size: 11px; font-weight: 500; }
+.bnav-item.active { color: var(--accent); }
+
+/* ===== ANIMATIONS ===== */
+@keyframes pulseRing {
+  0% { transform: scale(1); opacity: 0.5; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+@keyframes drawLine {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes leafGrow {
+  0% { opacity: 0; transform: scale(0.3) rotate(-20deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+@keyframes inkSpread {
+  0% { opacity: 0.6; r: 5; }
+  100% { opacity: 0; r: 80; }
+}
+@keyframes waveRipple {
+  0% { opacity: 0.5; r: 8; stroke-width: 2; }
+  100% { opacity: 0; r: 70; stroke-width: 0.5; }
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+:root {
+  --bg: #FAF8F5;
+  --surface: #F0F4F8;
+  --fg: #2D3748;
+  --muted: #8B9AAF;
+  --tier-border: #E2E8F0;
+  --tier-accent: #8BC6A0;
+  --tier-accent-soft: #D4EDDA;
+  --tier-accent-deep: #6BA882;
+  --tier-accent-rgb: 139, 198, 160;
+  --tier-radius: 16px;
+  --tier-radius-lg: 24px;
+  --tier-touch: 44px;
+  --tier-display: 'Noto Serif SC', serif;
+  --tier-body: 'Noto Sans SC', system-ui, sans-serif;
+  --paper-texture: none;
+}
+[data-tier="children"] {
+  --bg: #FFF9F2; --surface: #FFF3E8; --fg: #4A3728; --muted: #B8A090; --tier-border: #F0E0D0;
+  --tier-accent: #F5A0B8; --tier-accent-soft: #FDE8EF; --tier-accent-deep: #F0909A; --tier-accent-rgb: 245,160,184;
+  --tier-radius: 24px; --tier-radius-lg: 32px; --tier-touch: 48px; --tier-display: 'Noto Sans SC', sans-serif;
+}
+[data-tier="adult"] {
+  --bg: #F5F0E8; --surface: #EDE8DF; --fg: #3D3228; --muted: #9B8E80; --tier-border: #DDD5C8;
+  --tier-accent: #8BA89A; --tier-accent-soft: rgba(139,168,154,.12); --tier-accent-deep: #5C7A6A; --tier-accent-rgb: 139,168,154;
+  --tier-radius: 12px; --tier-radius-lg: 18px;
+  --paper-texture: repeating-linear-gradient(0deg,transparent 0 2px,rgba(61,50,40,.025) 2px 4px),repeating-linear-gradient(90deg,transparent 0 2px,rgba(61,50,40,.02) 2px 4px);
+}
+[data-tier="elderly"] {
+  --bg: #F5EDE0; --surface: #EDE5D8; --fg: #3A2E22; --muted: #8B7B68; --tier-border: #D8CCBC;
+  --tier-accent: #6B8F71; --tier-accent-soft: #D4E8D4; --tier-accent-deep: #5A7A60; --tier-accent-rgb: 107,143,113;
+  --tier-radius: 14px; --tier-radius-lg: 20px; --tier-touch: 64px; --tier-display: 'Noto Sans SC', sans-serif;
+}
+body { background:#E8E4DF; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; padding:16px; overflow:auto; }
+.control-bar { width:100%; max-width:100%; background:var(--bg); border-radius:0; box-shadow:none; padding:12px 14px; margin-bottom:0; z-index:500; flex-shrink:0; }
+.control-title { font-size:13px; font-weight:600; color:#2D3748; margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.control-title small { color:#8A9BA8; font-size:11px; font-weight:400; }
+.tier-switcher { display:flex; gap:6px; }
+.tier-btn { flex:1; padding:9px 4px; border:1.5px solid #E2E8F0; background:#fff; border-radius:10px; font:600 12px var(--tier-body); color:#6B7B8A; cursor:pointer; }
+.tier-btn.active { color:#fff; border-color:transparent; }
+.tier-btn[data-tier="children"].active { background:#F5A0B8; }
+.tier-btn[data-tier="youth"].active { background:#8BC6A0; }
+.tier-btn[data-tier="adult"].active { background:#8BA89A; }
+.tier-btn[data-tier="elderly"].active { background:#6B8F71; }
+.device { width:375px; height:min(812px,calc(100dvh - 132px)); max-width:100%; border-radius:32px; background:var(--bg); color:var(--fg); font-family:var(--tier-body); box-shadow:0 8px 32px rgba(0,0,0,.1); transition:background .35s ease; margin:0 auto; display:flex; flex-direction:column; overflow:hidden; position:relative; }
+.device::before { content:''; position:absolute; inset:0; background:var(--paper-texture); pointer-events:none; z-index:1; }
+.screen { background:var(--bg) !important; }
+.cal-header { padding:48px 20px 10px; }
+.cal-greeting h1,.journal-date,.arch-header h2 { font-family:var(--tier-display); color:var(--fg); }
+.cal-greeting .sub,.journal-prompt { color:var(--muted); }
+.stage-badge,.journal-stage { background:var(--tier-accent-soft); color:var(--tier-accent-deep); border-radius:999px; }
+.stage-badge svg,.journal-stage svg { color:var(--tier-accent); }
+.cal-stats,.timeline-entry,.arch-entry,.growth-summary,.echo-narrative,.echo-player { background:var(--surface); border-color:var(--tier-border); border-radius:var(--tier-radius); }
+.cal-stat .num,.entry-text .title,.atitle,.echo-narrative p { color:var(--fg); }
+.cal-stat .label,.entry-text .excerpt,.entry-date,.ameta { color:var(--muted); }
+.timeline-entry { border-left:1px solid var(--tier-border) !important; padding:12px; }
+.entry-thumb,.arch-thumb { background:var(--tier-accent-soft); border-radius:12px; }
+.fab,.gen-btn,.play-btn,.echo-act.primary { background:var(--tier-accent); box-shadow:0 4px 16px rgba(var(--tier-accent-rgb),.32); }
+.fab { bottom:84px; width:56px; height:56px; }
+.bnav { height:68px; background:rgba(255,255,255,.72); border-color:var(--tier-border); backdrop-filter:blur(16px); }
+.bnav-item { color:var(--muted); min-height:44px; }
+.bnav-item.active { color:var(--tier-accent-deep); }
+.journal-header { padding:48px 20px 0; }
+.journal-body { padding-top:10px; }
+.j-tab { border-color:var(--tier-border); background:var(--surface); color:var(--muted); border-radius:12px; min-height:var(--tier-touch); }
+.j-tab.active { border-color:var(--tier-accent); background:var(--tier-accent-soft); color:var(--tier-accent-deep); }
+.j-textarea,.doodle-wrap { background:var(--surface); border-color:var(--tier-border); border-radius:var(--tier-radius); color:var(--fg); }
+.j-textarea:focus { border-color:var(--tier-accent); }
+.voice-orb { background:var(--tier-accent-soft); }
+.voice-orb svg,.voice-bars .bar { color:var(--tier-accent); background:var(--tier-accent); }
+.voice-orb::after { border-color:var(--tier-accent); }
+.photo-add { border-color:var(--tier-border); color:var(--muted); border-radius:var(--tier-radius); }
+.photo-add:hover { border-color:var(--tier-accent); color:var(--tier-accent-deep); }
+.d-color.active { border-color:var(--tier-accent-deep); }
+.gen-btn { border-radius:var(--tier-radius); min-height:var(--tier-touch); }
+[data-component="Sprouting"] { background:var(--bg) !important; }
+.sprout-label { color:var(--muted); font-family:var(--tier-display); }
+.echo-tag,.growth-kw { background:var(--tier-accent-soft); color:var(--tier-accent-deep); }
+.p-progress-fill,.p-wave .bar.on { background:var(--tier-accent); }
+.arch-header { background:var(--bg); }
+[data-tier="elderly"] { font-size:18px; }
+[data-tier="elderly"] .bnav { height:80px; }
+[data-tier="elderly"] .bnav-item span { font-size:14px; }
+[data-tier="elderly"] .j-tab,[data-tier="elderly"] .gen-btn { font-size:16px; }
+@media (max-width:430px) {
+  body { padding:0; background:var(--bg); }
+  .control-bar { max-width:none; margin:0; border-radius:0; box-shadow:none; padding-bottom:0; background:var(--bg); }
+  .device { width:100%; height:calc(100dvh - 104px); border-radius:0; box-shadow:none; }
+}
+</style>
+</head>
+<body>
+<div class="device" id="device" data-tier="youth">
+  <div class="control-bar">
+    <div class="control-title"><span>聲畫合鳴</span><small>选择你的视觉模式</small></div>
+    <div class="tier-switcher" id="tierSwitcher">
+      <button class="tier-btn" data-tier="children">少儿奶柔</button>
+      <button class="tier-btn active" data-tier="youth">青年清透</button>
+      <button class="tier-btn" data-tier="adult">成人哑光</button>
+      <button class="tier-btn" data-tier="elderly">适老康养</button>
+    </div>
+  </div>
+<main>
+
+  <!-- ===== CALENDAR HOME ===== -->
+  <div class="screen active" id="calHome" data-component="Calendar Home">
+    <div class="cal-header">
+      <div class="cal-greeting">
+        <div>
+          <h1 id="tierGreeting">晚好，今夜允许和自己独处 🌙</h1>
+          <p class="sub" id="tierSubtitle">你的声画花园正在生长</p>
+        </div>
+        <div class="stage-badge" data-component="Stage Indicator">
+          <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M7 12V5"/><path d="M4 7 Q5 4,7 3 Q9 4,10 7"/><path d="M3 9 Q4 6,7 5 Q10 6,11 9"/></svg>
+          <span id="homeStage">花苞期</span>
+        </div>
+      </div>
+      <div class="cal-stats">
+        <div class="cal-stat"><div class="num" id="totalRecords">0</div><div class="label">累计记录</div></div>
+        <div class="cal-stat"><div class="num" id="streakDays">0</div><div class="label">连续天数</div></div>
+        <div class="cal-stat"><div class="num" id="stageStat">花苞</div><div class="label">成长阶段</div></div>
+      </div>
+    </div>
+    <div class="timeline" id="timeline" data-component="Calendar Timeline">
+      <!-- Populated by JS -->
+    </div>
+    <button class="fab" id="fabRecord" aria-label="记录今日">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+    </button>
+  </div>
+
+  <!-- ===== JOURNAL ENTRY ===== -->
+  <div class="screen" id="journal" data-component="Journal Entry">
+    <div class="journal-header">
+      <h2 class="journal-date" id="journalDate">8月1日 星期五</h2>
+      <div class="journal-stage">
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M7 12V5"/><path d="M4 7 Q5 4,7 3 Q9 4,10 7"/></svg>
+        <span id="journalStage">花苞期</span>
+      </div>
+    </div>
+    <div class="journal-body">
+      <p class="journal-prompt" id="journalPrompt">「把今日心事、细碎欢喜都留在这里」</p>
+      <div class="j-tabs" data-component="Input Tabs">
+        <button class="j-tab active" data-tab="text">
+          <svg viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M2 3h11M2 7h7M2 11h9"/></svg>文字
+        </button>
+        <button class="j-tab" data-tab="voice">
+          <svg viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="4.5" y="1" width="6" height="8" rx="3"/><path d="M3 7a4.5 4.5 0 009 0M7.5 11v2.5"/></svg>语音
+        </button>
+        <button class="j-tab" data-tab="photo">
+          <svg viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="1" y="3" width="13" height="10" rx="2"/><circle cx="7.5" cy="8.5" r="2.5"/><path d="M4.5 3l1-2h4l1 2"/></svg>拍照
+        </button>
+        <button class="j-tab" data-tab="doodle">
+          <svg viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M10.5 1.5l3 3-8 8H2.5v-3z"/><path d="M8.5 3.5l3 3"/></svg>涂鸦
+        </button>
+      </div>
+      <div class="j-panels">
+        <div class="j-panel active" id="pText">
+          <textarea class="j-textarea" id="journal-text-input" name="journal_text" placeholder="写下此刻的心情、想法、或随手记录的一段文字..." aria-label="文字输入"></textarea>
+        </div>
+        <div class="j-panel" id="pVoice">
+          <div class="voice-area">
+            <div class="voice-orb" id="voiceOrb" aria-label="开始录音">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="7" y="1" width="10" height="13" rx="5"/><path d="M4 10a8 8 0 0016 0M12 18v4M8 22h8"/></svg>
+            </div>
+            <div class="voice-bars" id="voiceBars"></div>
+            <p class="voice-status" id="voiceStatus">轻触开始录音</p>
+            <p class="voice-timer" id="voiceTimer">00:00</p>
+          </div>
+        </div>
+        <div class="j-panel" id="pPhoto">
+          <div class="photo-area">
+            <div class="photo-grid">
+              <div class="photo-cell" id="photoPreview" hidden><img id="photoPreviewImg" alt="已选择的照片"></div>
+              <div class="photo-add" id="photoAdd"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M10 4v12M4 10h12"/></svg><span>添加</span></div>
+            </div>
+            <input id="photoInput" type="file" accept="image/*" capture="environment" hidden>
+            <p style="font-size:12px;color:var(--text-muted);text-align:right;margin-top:4px;">选择或拍摄照片，AI 将感受画面意境</p>
+          </div>
+        </div>
+        <div class="j-panel" id="pDoodle">
+          <div class="doodle-area">
+            <div class="doodle-wrap"><canvas id="doodleCvs" width="600" height="400"></canvas></div>
+            <div class="doodle-tools">
+              <div class="d-color active" style="background:var(--warm-gold)" data-c="var(--warm-gold)"></div>
+              <div class="d-color" style="background:var(--accent)" data-c="var(--accent)"></div>
+              <div class="d-color" style="background:var(--stage-sprout)" data-c="var(--stage-sprout)"></div>
+              <div class="d-color" style="background:var(--illus-soil)" data-c="var(--illus-soil)"></div>
+              <div class="d-color" style="background:var(--illus-ocean)" data-c="var(--illus-ocean)"></div>
+              <button class="d-clear" id="doodleClear">清除</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="gen-bar">
+      <button class="gen-btn" id="genBtn">
+        <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 16V8"/><path d="M5 11 Q6 6,9 4 Q12 6,13 11"/><path d="M3 14 Q5 9,9 7 Q13 9,15 14"/></svg>
+        合鸣发芽
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== SPROUTING ===== -->
+  <div class="screen" id="sprouting" data-component="Sprouting">
+    <div class="sprout-phase active" id="sp1">
+      <svg class="sprout-svg" viewBox="0 0 120 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="60" cy="140" rx="35" ry="8" fill="var(--illus-soil)" opacity="0.3"/>
+        <rect x="40" y="130" width="40" height="20" rx="4" fill="var(--illus-soil)" opacity="0.5"/>
+        <path class="sprout-stem" d="M60 130 L60 70" stroke="var(--illus-leaf)" stroke-width="2.5" stroke-linecap="round"/>
+        <path class="sprout-leaf-l" d="M60 90 Q45 75,40 60 Q50 65,60 80" fill="var(--illus-leaf)" opacity="0.8"/>
+        <path class="sprout-leaf-r" d="M60 80 Q75 65,82 50 Q72 60,60 72" fill="var(--illus-leaf-dark)" opacity="0.7"/>
+      </svg>
+      <p class="sprout-label" id="sproutLabel1">正在收纳今日细碎心绪...</p>
+    </div>
+    <div class="sprout-phase" id="sp2">
+      <svg class="ink-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <circle class="ink-ring ink-ring-1" cx="100" cy="100" r="5" fill="none" stroke="var(--illus-ink)" stroke-width="1.5" opacity="0"/>
+        <circle class="ink-ring ink-ring-2" cx="100" cy="100" r="5" fill="none" stroke="var(--illus-ink)" stroke-width="1" opacity="0"/>
+        <circle class="ink-ring ink-ring-3" cx="100" cy="100" r="5" fill="none" stroke="var(--warm-gold)" stroke-width="0.8" opacity="0"/>
+      </svg>
+      <div class="gen-narrative" id="genNarrative"></div>
+      <p class="sprout-label" id="sproutLabel2">正在编织你的内心叙事...</p>
+    </div>
+    <div class="sprout-phase" id="sp3">
+      <svg class="wave-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <circle class="wave-circle wave-c1" cx="100" cy="100" r="8" fill="none" stroke="var(--illus-wave)" stroke-width="2" opacity="0"/>
+        <circle class="wave-circle wave-c2" cx="100" cy="100" r="8" fill="none" stroke="var(--illus-wave)" stroke-width="1.5" opacity="0"/>
+        <circle class="wave-circle wave-c3" cx="100" cy="100" r="8" fill="none" stroke="var(--illus-wave)" stroke-width="1" opacity="0"/>
+        <circle class="wave-circle wave-c4" cx="100" cy="100" r="8" fill="none" stroke="var(--illus-wave)" stroke-width="0.8" opacity="0"/>
+        <circle cx="100" cy="100" r="4" fill="var(--illus-wave)" opacity="0.6"/>
+      </svg>
+      <div class="gen-waveform-wrap" id="genWaveform"></div>
+      <p class="sprout-label" id="sproutLabel3">正在发芽你的内心回响...</p>
+    </div>
+  </div>
+
+  <!-- ===== ECHO CARD ===== -->
+  <div class="screen" id="echoCard" data-component="Echo Card">
+    <div class="echo-view">
+      <div class="echo-hero" id="echoHero"></div>
+      <div class="echo-player" data-component="Audio Player">
+        <div class="player-row">
+          <button class="play-btn" id="playBtn" aria-label="播放">
+            <svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2l10 6-10 6V2z"/></svg>
+          </button>
+          <div class="player-info">
+            <p class="ptitle">专属冥想 · 城市暮色</p>
+            <p class="pdur">00:00</p>
+          </div>
+        </div>
+        <div class="p-wave" id="pWave"></div>
+        <div class="p-progress" id="pProgress"><div class="p-progress-fill" id="pFill"></div></div>
+        <div class="p-time"><span id="pCur">00:00</span><span class="pdur">00:00</span></div>
+      </div>
+      <div class="echo-narrative">
+        <p id="narText">今天的你在城市的喧嚣中停下了脚步，窗外的暮色正缓缓铺开。远处高楼的轮廓在橘粉色的天际线中渐渐模糊，像是生活给你按下了一次轻柔的暂停键。那些来不及说出口的心事，在这个黄昏有了落脚的地方。你不需要追赶什么，也不需要证明什么。这一刻的安静，是你给自己最温柔的礼物。</p>
+        <div class="echo-tags">
+          <span class="echo-tag gold" id="narDateTag">—</span>
+          <span class="echo-tag" id="echoStageTag">花苞期</span>
+          <span class="echo-tag" id="inputTypeTag">文字输入</span>
+        </div>
+      </div>
+      <div class="echo-actions">
+        <button class="echo-act" aria-label="分享">
+          <svg viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="11" cy="3.5" r="2"/><circle cx="4" cy="7.5" r="2"/><circle cx="11" cy="11.5" r="2"/><path d="M6 6.5l3-2M6 8.5l3 2"/></svg>
+          分享
+        </button>
+        <button class="echo-act primary" id="archiveBtn" aria-label="查看档案">
+          <svg viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M7.5 1v9M4 6.5l3.5 3.5L11 6.5"/><path d="M2 10v3h11v-3"/></svg>
+          查看档案
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== GROWTH ARCHIVE ===== -->
+  <div class="screen" id="archive" data-component="Growth Archive">
+    <div class="arch-header">
+      <h2>我的时光档案馆</h2>
+      <div class="arch-overview">
+        <div class="arch-stat"><div class="num" id="archiveTotal">0</div><div class="label">声画记录</div></div>
+        <div class="arch-stat"><div class="num" id="archiveDays">0</div><div class="label">陪伴天数</div></div>
+        <div class="arch-stat"><div class="num" id="archiveStage">花苞</div><div class="label">成长阶段</div></div>
+      </div>
+    </div>
+    <div class="arch-body" id="archBody">
+      <!-- Populated by JS -->
+    </div>
+  </div>
+
+</main>
+
+  <!-- ===== BOTTOM NAV ===== -->
+  <nav class="bnav" id="bnav" data-component="Bottom Navigation">
+    <button class="bnav-item active" data-nav="calHome" aria-label="日历">
+      <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="16" height="16" rx="2"/><path d="M3 9h16M8 2v4M14 2v4"/><circle cx="8" cy="14" r="1" fill="currentColor"/><circle cx="11" cy="14" r="1" fill="currentColor"/><circle cx="14" cy="14" r="1" fill="currentColor"/></svg>
+      <span>日历</span>
+    </button>
+    <button class="bnav-item" data-nav="journal" aria-label="记录">
+      <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 19V10"/><path d="M6 14 Q8 7,11 4 Q14 7,16 14"/><path d="M3 18 Q6 11,11 8 Q16 11,19 18"/></svg>
+      <span>记录</span>
+    </button>
+    <button class="bnav-item" data-nav="archive" aria-label="档案馆">
+      <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h16v3H3z"/><path d="M4 9v8a2 2 0 002 2h10a2 2 0 002-2V9"/><path d="M8 13h6"/><circle cx="11" cy="4" r="1.5" fill="none"/></svg>
+      <span>档案馆</span>
+    </button>
+  </nav>
+
+</div>
+
+<script>
+(function(){
+'use strict';
+
+// ===== API =====
+const API_BASE = '';
+let BACKEND_DEMO_MODE = false;  // 后端 Demo 模式（无 API Key）
+let audioEl = null;
+let curAudioUrl = null;
+let curTheme = '';
+let activeInput = 'text';
+let selectedPhoto = null;
+let selectedPhotoUrl = '';
+let currentTier = localStorage.getItem('echo-tier') || 'youth';
+let generating = false;
+
+const TIERS = {
+  children:{stage:'嫩芽',stageShort:'嫩芽',greeting:'早上好呀，今天也要开开心心的哦！',subtitle:'把每一份小开心都放进百宝箱',guide:'记录今天的小开心吧！',placeholder:'画下或写下今天开心的事～',sprout:'正在种下你的小开心～',write:'画画',archive:'百宝箱'},
+  youth:{stage:'花苞期',stageShort:'花苞',greeting:'晚好，今夜允许和自己独处 🌙',subtitle:'你的声画花园正在生长',guide:'把今日心事、细碎欢喜都留在这里',placeholder:'写下此刻的想法...',sprout:'正在收纳今日细碎心绪',write:'书写',archive:'档案馆'},
+  adult:{stage:'盛放期',stageShort:'盛放',greeting:'夜深了，留一段时光给自己',subtitle:'在忙碌之外，听见自己的回声',guide:'独处之时，写下内心独白',placeholder:'此刻，你想对自己说什么...',sprout:'正在沉淀你的专属时光',write:'书写',archive:'档案馆'},
+  elderly:{stage:'晚岁安和',stageShort:'安和',greeting:'下午好，今天过得怎么样？',subtitle:'每一天的故事，都值得被珍藏',guide:'说说今天的事吧',placeholder:'在这里写字，或按语音说说今天...',sprout:'正在封存今日岁月闲思',write:'记录',archive:'回忆'}
+};
+
+function applyTier(tier){
+  currentTier=TIERS[tier]?tier:'youth';
+  localStorage.setItem('echo-tier',currentTier);
+  document.getElementById('device').dataset.tier=currentTier;
+  document.querySelectorAll('.tier-btn').forEach(btn=>btn.classList.toggle('active',btn.dataset.tier===currentTier));
+  const t=TIERS[currentTier];
+  document.getElementById('tierGreeting').textContent=t.greeting;
+  document.getElementById('tierSubtitle').textContent=t.subtitle;
+  document.getElementById('homeStage').textContent=t.stage;
+  document.getElementById('journalStage').textContent=t.stage;
+  document.getElementById('stageStat').textContent=t.stageShort;
+  document.getElementById('archiveStage').textContent=t.stageShort;
+  document.getElementById('journalPrompt').textContent='「'+t.guide+'」';
+  document.querySelector('.j-textarea').placeholder=t.placeholder;
+  document.getElementById('sproutLabel1').textContent=t.sprout+'...';
+  document.getElementById('echoStageTag').textContent=t.stage;
+  const navJ=document.querySelector('[data-nav="journal"]');navJ.querySelector('span').textContent=t.write;navJ.setAttribute('aria-label',t.write);
+  const navA=document.querySelector('[data-nav="archive"]');navA.querySelector('span').textContent=t.archive;navA.setAttribute('aria-label',t.archive);
+  const activeDot=document.querySelector('.d-color.active');
+  if(activeDot && typeof resolveDoodleColor==='function')dColor=resolveDoodleColor(activeDot.dataset.c);
+}
+
+document.querySelectorAll('.tier-btn').forEach(btn=>btn.addEventListener('click',()=>applyTier(btn.dataset.tier)));
+
+function wait(ms){return new Promise(r=>setTimeout(r,ms));}
+function fmtT(s){s=Math.floor(s||0);return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');}
+
+async function readApiResponse(r){
+  const data=await r.json().catch(()=>({}));
+  if(!r.ok) throw new Error(data.error||'请求失败('+r.status+')');
+  return data;
+}
+async function apiGenerate(type, content, theme){
+  const r=await fetch(API_BASE+'/api/echo/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:type,content:content,theme:theme})});
+  return readApiResponse(r);
+}
+async function apiGenerateVoice(blob, theme){
+  const form=new FormData();
+  const ext=blob.type.includes('ogg')?'ogg':blob.type.includes('mp4')?'m4a':'webm';
+  form.append('file',blob,'voice.'+ext);
+  form.append('theme',theme);
+  const r=await fetch(API_BASE+'/api/echo/voice',{method:'POST',body:form});
+  return readApiResponse(r);
+}
+function fileToDataUrl(file){
+  return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(new Error('图片读取失败'));reader.readAsDataURL(file);});
+}
+async function prepareImage(file){
+  if(!file.type.startsWith('image/')) throw new Error('请选择图片文件');
+  if(file.size>10*1024*1024) throw new Error('图片大小不能超过 10MB');
+  return fileToDataUrl(file);
+}
+async function apiGetTheme(){
+  const r=await fetch(API_BASE+'/api/theme/today');
+  if(!r.ok) throw new Error('主题获取失败');
+  return r.json();
+}
+async function apiGetDiary(){
+  const r=await fetch(API_BASE+'/api/diary');
+  if(!r.ok) throw new Error('日记获取失败');
+  return r.json();
+}
+
+// ===== DATA =====
+let timelineData = [];
+
+const stageNames = { sprout: '嫩芽', bud: '花苞', bloom: '盛放', wood: '静木' };
+
+// SVG thumbnails
+const thumbSVG = {
+  bloom: '<svg viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg"><rect width="52" height="52" fill="var(--illus-night)"/><circle cx="38" cy="14" r="5" fill="var(--illus-moon-glow)" opacity="0.25"/><path d="M0 34 Q13 28,26 32 T52 28 L52 52 L0 52Z" fill="var(--illus-night)" opacity="0.8"/></svg>',
+  bud: '<svg viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg"><rect width="52" height="52" fill="var(--illus-sky-day)"/><circle cx="26" cy="26" r="10" fill="var(--illus-wave)" opacity="0.1"/></svg>',
+  sprout: '<svg viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg"><rect width="52" height="52" fill="#FFF5EC"/><circle cx="38" cy="14" r="7" fill="var(--illus-sun)" opacity="0.3"/><path d="M0 40 Q13 33,26 38 T52 34 L52 52 L0 52Z" fill="var(--illus-garden)" opacity="0.3"/></svg>',
+  wood: '<svg viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg"><rect width="52" height="52" fill="var(--illus-moon)"/><circle cx="38" cy="12" r="6" fill="var(--illus-sun)" opacity="0.2"/><path d="M12 40 Q15 32,18 36 T24 28 L28 40Z" fill="var(--illus-leaf)" opacity="0.2"/></svg>',
+};
+
+const heroSVGs = {
+  bloom: '<svg viewBox="0 0 400 225" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="sk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2D3040"/><stop offset="0.6" stop-color="#3A2E48"/><stop offset="1" stop-color="#4A3F35"/></linearGradient><radialGradient id="glow"><stop offset="0" stop-color="#F5E8D4" stop-opacity="0.25"/><stop offset="1" stop-color="#F5E8D4" stop-opacity="0"/></radialGradient></defs><rect width="400" height="225" fill="url(#sk)"/><circle cx="200" cy="100" r="90" fill="url(#glow)"/><circle cx="200" cy="100" r="55" fill="none" stroke="#F5E8D4" stroke-width="1" opacity="0.15"/><circle cx="200" cy="100" r="38" fill="none" stroke="#F5E8D4" stroke-width="1" opacity="0.2"/><circle cx="200" cy="100" r="22" fill="none" stroke="#F5E8D4" stroke-width="1" opacity="0.3"/><path d="M200 82 Q194 84 192 78 Q190 82 194 84 Q192 84 192 88 Q200 94 208 88 Q208 84 206 84 Q210 82 208 78 Q206 84 200 82Z" fill="#F5E8D4" opacity="0.85"/><path d="M183 94 Q180 108 184 120 Q190 130 200 132 Q210 130 216 120 Q220 108 217 94 Q210 102 200 102 Q190 102 183 94Z" fill="#F5E8D4" opacity="0.7"/><path d="M175 100 Q173 115 178 128" stroke="#F5E8D4" stroke-width="1.5" fill="none" opacity="0.5" stroke-linecap="round"/><path d="M225 100 Q227 115 222 128" stroke="#F5E8D4" stroke-width="1.5" fill="none" opacity="0.5" stroke-linecap="round"/><ellipse cx="200" cy="180" rx="45" ry="6" fill="#F5E8D4" opacity="0.08"/><ellipse cx="200" cy="178" rx="28" ry="4" fill="#F5E8D4" opacity="0.12"/><circle cx="320" cy="40" r="20" fill="#F5E8D4" opacity="0.12"/><circle cx="80" cy="30" r="1" fill="#F5E8D4" opacity="0.4"/><circle cx="350" cy="60" r="0.8" fill="#F5E8D4" opacity="0.3"/><circle cx="50" cy="50" r="0.7" fill="#F5E8D4" opacity="0.3"/></svg>',
+  bud: '<svg viewBox="0 0 400 225" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="sk2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E8DFD0"/><stop offset="0.5" stop-color="#F0E4D0"/><stop offset="1" stop-color="#D4E8E0"/></linearGradient></defs><rect width="400" height="225" fill="url(#sk2)"/><circle cx="200" cy="95" r="70" fill="#9CB8C8" opacity="0.08"/><circle cx="200" cy="95" r="45" fill="#9CB8C8" opacity="0.06"/><path d="M195 130 Q185 120 188 105 Q195 95 200 100 Q205 95 212 105 Q215 120 205 130 Q200 135 195 130Z" fill="#8CCBB8" opacity="0.5"/><path d="M200 105 Q198 95 200 85 Q202 95 200 105Z" fill="#E8B4BC" opacity="0.45"/><path d="M180 115 Q175 108 178 98 Q185 92 188 100" fill="#8CCBB8" opacity="0.35"/><path d="M220 115 Q225 108 222 98 Q215 92 212 100" fill="#8CCBB8" opacity="0.35"/><ellipse cx="200" cy="175" rx="55" ry="5" fill="#9CB8C8" opacity="0.1"/><ellipse cx="200" cy="172" rx="35" ry="3" fill="#9CB8C8" opacity="0.15"/><path d="M165 155 Q200 150 235 155" stroke="#9CB8C8" stroke-width="1" fill="none" opacity="0.2"/><path d="M155 165 Q200 160 245 165" stroke="#9CB8C8" stroke-width="1" fill="none" opacity="0.15"/><circle cx="200" cy="50" r="3" fill="#F5E8D4" opacity="0.5"/></svg>',
+  sprout: '<svg viewBox="0 0 400 225" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="sk3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF5EC"/><stop offset="0.6" stop-color="#F5E8D4"/><stop offset="1" stop-color="#E8DCC8"/></linearGradient></defs><rect width="400" height="225" fill="url(#sk3)"/><circle cx="310" cy="50" r="30" fill="#F5C99B" opacity="0.2"/><circle cx="200" cy="110" r="60" fill="#B8D4A8" opacity="0.08"/><path d="M195 145 Q192 125 195 105 Q198 90 200 88 Q202 90 205 105 Q208 125 205 145 Q200 150 195 145Z" fill="#B8D4A8" opacity="0.5"/><path d="M200 95 Q195 90 200 78 Q205 90 200 95Z" fill="#E8B4BC" opacity="0.4"/><path d="M200 105 Q185 100 175 110 Q170 120 175 125" stroke="#B8D4A8" stroke-width="2" fill="none" opacity="0.4" stroke-linecap="round"/><path d="M200 115 Q215 110 225 120 Q230 130 225 135" stroke="#B8D4A8" stroke-width="2" fill="none" opacity="0.4" stroke-linecap="round"/><ellipse cx="200" cy="180" rx="50" ry="5" fill="#8B7355" opacity="0.1"/><ellipse cx="200" cy="178" rx="30" ry="3" fill="#8B7355" opacity="0.15"/><path d="M170 160 Q200 155 230 160" stroke="#9CB8C8" stroke-width="1" fill="none" opacity="0.2"/><path d="M160 170 Q200 165 240 170" stroke="#9CB8C8" stroke-width="1" fill="none" opacity="0.15"/><circle cx="200" cy="130" r="25" fill="none" stroke="#B8D4A8" stroke-width="1" opacity="0.12"/><circle cx="200" cy="130" r="15" fill="none" stroke="#B8D4A8" stroke-width="1" opacity="0.18"/></svg>',
+  wood: '<svg viewBox="0 0 400 225" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="sk4" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C8B898"/><stop offset="0.5" stop-color="#D4C4A8"/><stop offset="1" stop-color="#A89878"/></linearGradient></defs><rect width="400" height="225" fill="url(#sk4)"/><circle cx="200" cy="95" r="50" fill="none" stroke="#8B7355" stroke-width="2" opacity="0.2"/><circle cx="200" cy="95" r="35" fill="none" stroke="#8B7355" stroke-width="1.5" opacity="0.25"/><circle cx="200" cy="95" r="20" fill="none" stroke="#8B7355" stroke-width="1" opacity="0.3"/><path d="M196 88 Q193 90 192 86 Q190 90 193 88 Q192 90 194 92 Q200 96 206 92 Q208 90 207 88 Q210 90 208 86 Q207 90 204 88 Q202 86 200 87 Q198 86 196 88Z" fill="#8B7355" opacity="0.55"/><path d="M186 98 Q184 110 188 118 Q194 124 200 125 Q206 124 212 118 Q216 110 214 98 Q208 103 200 103 Q192 103 186 98Z" fill="#8B7355" opacity="0.4"/><path d="M180 103 Q179 115 183 122" stroke="#8B7355" stroke-width="1.5" fill="none" opacity="0.3" stroke-linecap="round"/><path d="M220 103 Q221 115 217 122" stroke="#8B7355" stroke-width="1.5" fill="none" opacity="0.3" stroke-linecap="round"/><ellipse cx="200" cy="170" rx="48" ry="5" fill="#8B7355" opacity="0.08"/><ellipse cx="200" cy="168" rx="30" ry="3" fill="#8B7355" opacity="0.12"/><path d="M165 150 Q200 145 235 150" stroke="#8B7355" stroke-width="1" fill="none" opacity="0.15"/><path d="M155 160 Q200 155 245 160" stroke="#8B7355" stroke-width="1" fill="none" opacity="0.1"/><circle cx="320" cy="45" r="18" fill="#8B7355" opacity="0.12"/></svg>',
+};
+
+const narratives = {
+  bloom: '今天的你在城市的喧嚣中停下了脚步，窗外的暮色正缓缓铺开。远处高楼的轮廓在橘粉色的天际线中渐渐模糊，像是生活给你按下了一次轻柔的暂停键。那些来不及说出口的心事，在这个黄昏有了落脚的地方。你不需要追赶什么，也不需要证明什么。这一刻的安静，是你给自己最温柔的礼物。',
+  bud: '午后的阳光透过窗户洒在桌面上，你在课本边角画了一个小小的星球。那个星球上没有考试，没有排名，只有软绵绵的云和会唱歌的风。偶尔躲一躲也没关系，等你准备好了，再回到这个吵闹又可爱的世界。',
+  sprout: '在一片铺满金色落叶的小路上，有一只小松鼠正在收集松果。它圆圆的大眼睛闪着好奇的光。今天它发现了一颗特别大的松果！小松鼠高兴地把松果抱在怀里，一步一步蹦回了树洞里的家。晚安，小松鼠。',
+  wood: '早晨推开窗，院子里的桂花又开了。那股清甜的香味啊，跟几十年前老家的味道一模一样。阳光慢慢爬上了阳台的藤椅，你坐下来，泡了一杯茶。日子就是这么慢慢过的，慢慢地，就很好了。',
+};
+
+// ===== SCREEN NAV =====
+let curScreen = 'calHome';
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  curScreen = id;
+  document.querySelectorAll('.bnav-item').forEach(n => n.classList.toggle('active', n.dataset.nav === id));
+  const hideNav = ['sprouting'];
+  document.getElementById('bnav').style.display = hideNav.includes(id) ? 'none' : 'flex';
+}
+
+// ===== RENDER TIMELINE =====
+function renderTimeline() {
+  const el = document.getElementById('timeline');
+  if (!timelineData.length) {
+    el.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:60px 20px;font-size:14px;">还没有回声，点击下方按钮写下第一句</div>';
+    return;
+  }
+  el.innerHTML = timelineData.map(m => `
+    <div class="timeline-month">
+      <div class="timeline-month-label">${m.month}</div>
+      ${m.entries.map(e => `
+        <div class="timeline-entry" data-stage="${e.stage}" data-audio="${e.audio_url||''}" data-component="Timeline Entry">
+          <div class="entry-thumb">${thumbSVG[e.stage]}</div>
+          <div class="entry-body">
+            <div class="entry-meta">
+              <span class="entry-date">${e.date}</span>
+              <span class="entry-stage" data-s="${e.stage}">${stageNames[e.stage]}</span>
+            </div>
+            <div class="entry-text">
+              <p class="title">${e.title}</p>
+              <p class="excerpt">${e.excerpt}</p>
+            </div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `).join('');
+}
+
+async function loadTimelineData() {
+  try {
+    const diary = await apiGetDiary();
+    const inputLabels = {text:'文字',voice:'语音',image:'拍照',doodle:'涂鸦'};
+    const months = {};
+    // 前端兜底去重：按 narrative 去重
+    const _seen = new Set();
+    Object.keys(diary).sort().reverse().forEach(date => {
+      (diary[date]||[]).forEach(rec => {
+        const _nar = rec.narrative || '';
+        if (_seen.has(_nar)) return;
+        _seen.add(_nar);
+        const d = new Date(rec.created_at || date);
+        const mKey = d.getFullYear()+'年'+(d.getMonth()+1)+'月';
+        if (!months[mKey]) months[mKey] = {month:mKey, entries:[]};
+        const n = rec.narrative || '';
+        months[mKey].entries.push({
+          date: (d.getMonth()+1)+'月'+d.getDate()+'日',
+          stage: 'bloom',
+          title: n.slice(0,12) || '回声',
+          excerpt: n.slice(0,30)+(n.length>30?'...':''),
+          input: inputLabels[rec.input_type] || '文字',
+          dur: '00:00',
+          audio_url: rec.audio_url || '',
+          narrative: n,
+          theme: rec.theme || '',
+          inputType: rec.input_type || 'text'
+        });
+      });
+    });
+    timelineData = Object.values(months);
+    const records=timelineData.flatMap(m=>m.entries);
+    const dates=[...new Set(Object.keys(diary))].sort().reverse();
+    let streak=0;
+    if(dates.length){
+      let cursor=new Date(dates[0]+'T00:00:00');
+      for(const date of dates){
+        const current=new Date(date+'T00:00:00');
+        if(Math.round((cursor-current)/86400000)>1)break;
+        streak++;cursor=current;
+      }
+    }
+    document.getElementById('totalRecords').textContent=records.length;
+    document.getElementById('streakDays').textContent=streak;
+    document.getElementById('archiveTotal').textContent=records.length;
+    document.getElementById('archiveDays').textContent=dates.length;
+  } catch(e) {
+    console.warn('日记加载失败:', e);
+  }
+  renderTimeline();
+  renderArchive();
+}
+
+// Timeline entry click
+document.getElementById('timeline').addEventListener('click', e => {
+  const entry = e.target.closest('.timeline-entry');
+  if (!entry) return;
+  const stage = entry.dataset.stage;
+  const title = entry.querySelector('.title').textContent;
+  const date = entry.querySelector('.entry-date').textContent;
+  const audioUrl = entry.dataset.audio || '';
+  let narrative = '', inputType = 'text', imageUrl = null;
+  for (const m of timelineData) {
+    for (const ent of m.entries) {
+      if (ent.date === date && ent.title === title) { narrative = ent.narrative || ''; inputType = ent.inputType || 'text'; imageUrl = ent.image_url || null; break; }
+    }
+  }
+  showEchoCard(stage, title, date, narrative, audioUrl, inputType, imageUrl);
+});
+
+// ===== RENDER ARCHIVE =====
+function renderArchive() {
+  const all = timelineData.flatMap(m => m.entries.map(e => ({...e, month: m.month})));
+  const el = document.getElementById('archBody');
+  if (!all.length) {
+    el.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:60px 20px;font-size:14px;">还没有回声记录</div>';
+    return;
+  }
+  let html = all.map(e => `
+    <div class="arch-entry" data-stage="${e.stage}" data-component="Archive Entry">
+      <div class="arch-thumb">${thumbSVG[e.stage]}</div>
+      <div class="arch-info">
+        <p class="atitle">${e.title}</p>
+        <div class="ameta">
+          <span>${e.date}</span><span>·</span>
+          <span>${stageNames[e.stage]}</span><span>·</span>
+          <span>${e.input}</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+  const streak = document.getElementById('streakDays').textContent;
+  const total = all.length;
+  const t = TIERS[currentTier];
+  html += `
+    <div class="growth-summary" data-component="Growth Summary">
+      <h3>
+        <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M9 16V8"/><path d="M5 11 Q6 6,9 4 Q12 6,13 11"/><path d="M3 14 Q5 9,9 7 Q13 9,15 14"/></svg>
+        成长小结
+      </h3>
+      <div class="growth-keywords">
+        <span class="growth-kw">深夜疗愈</span>
+        <span class="growth-kw">自我对话</span>
+        <span class="growth-kw">灵感留存</span>
+        <span class="growth-kw">童趣陪伴</span>
+        <span class="growth-kw">静心康养</span>
+      </div>
+      <div class="growth-milestone">
+        <p><strong>连续记录 ${streak} 天</strong>，累计 ${total} 条回声。${t.stage}的你，正在用声画记录建立和自己对话的习惯。</p>
+      </div>
+    </div>
+  `;
+  el.innerHTML = html;
+}
+
+// Archive entry click
+document.getElementById('archBody').addEventListener('click', e => {
+  const entry = e.target.closest('.arch-entry');
+  if (!entry) return;
+  const stage = entry.dataset.stage;
+  const title = entry.querySelector('.atitle').textContent;
+  const date = entry.querySelector('.ameta span').textContent;
+  let narrative = '', audioUrl = '', inputType = 'text';
+  for (const m of timelineData) {
+    for (const ent of m.entries) {
+      if (ent.date === date && ent.title === title) { narrative = ent.narrative || ''; audioUrl = ent.audio_url || ''; inputType = ent.inputType || 'text'; break; }
+    }
+  }
+  showEchoCard(stage, title, date, narrative, audioUrl, inputType);
+});
+
+function showEchoCard(stage, title, date, narrative, audioUrl, inputType, imageUrl) {
+  const heroEl = document.getElementById('echoHero');
+  const overlay = '<div class="echo-hero-overlay"><p class="echo-hero-date">' + date + '</p><h2 class="echo-hero-title">' + title + '</h2></div>';
+  if(imageUrl){
+    heroEl.innerHTML = '<img src="' + imageUrl + '" style="width:100%;height:100%;object-fit:cover;" />' + overlay;
+  } else {
+    heroEl.innerHTML = (heroSVGs[stage] || heroSVGs.bloom) + overlay;
+  }
+  document.getElementById('narText').textContent = narrative || narratives[stage] || narratives.bloom;
+  document.getElementById('narDateTag').textContent = date || '今天';
+  const inputLabels={text:'文字输入',voice:'语音输入',image:'拍照输入',doodle:'涂鸦输入'};
+  document.getElementById('inputTypeTag').textContent=inputLabels[inputType]||'回声记录';
+  curAudioUrl = audioUrl || null;
+  setupAudio(audioUrl);
+  resetPlayer();
+  show('echoCard');
+}
+
+// ===== BOTTOM NAV =====
+document.querySelectorAll('.bnav-item').forEach(n => {
+  n.addEventListener('click', () => show(n.dataset.nav));
+});
+
+// ===== FAB =====
+document.getElementById('fabRecord').addEventListener('click', () => {
+  const d = new Date();
+  const months = ['1','2','3','4','5','6','7','8','9','10','11','12'];
+  const days = ['日','一','二','三','四','五','六'];
+  document.getElementById('journalDate').textContent = months[d.getMonth()] + '月' + d.getDate() + '日 星期' + days[d.getDay()];
+  show('journal');
+});
+
+// ===== JOURNAL TABS =====
+document.querySelectorAll('.j-tab').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.j-tab').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    activeInput=t.dataset.tab;
+    document.querySelectorAll('.j-panel').forEach(p => p.classList.remove('active'));
+    const map = { text:'pText', voice:'pVoice', photo:'pPhoto', doodle:'pDoodle' };
+    document.getElementById(map[t.dataset.tab]).classList.add('active');
+  });
+});
+
+// ===== VOICE =====
+let rec = false, recSec = 0, recTimer, mediaRecorder = null, mediaStream = null, voiceBlob = null, voiceChunks = [];
+const vOrb = document.getElementById('voiceOrb');
+const vStatus = document.getElementById('voiceStatus');
+const vTimer = document.getElementById('voiceTimer');
+const vBars = document.getElementById('voiceBars');
+for(let i=0;i<20;i++){const b=document.createElement('div');b.className='bar';b.style.height='4px';vBars.appendChild(b);}
+
+function stopRecording(){
+  return new Promise(resolve=>{
+    if(!mediaRecorder||mediaRecorder.state==='inactive'){resolve();return;}
+    mediaRecorder.addEventListener('stop',resolve,{once:true});
+    mediaRecorder.stop();
+  });
+}
+vOrb.addEventListener('click', async () => {
+  if(!rec){
+    if(!navigator.mediaDevices||!window.MediaRecorder){alert('当前浏览器不支持录音，请更换浏览器');return;}
+    try{
+      mediaStream=await navigator.mediaDevices.getUserMedia({audio:true});
+      const preferred=['audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus'];
+      const mimeType=preferred.find(x=>MediaRecorder.isTypeSupported(x))||'';
+      mediaRecorder=new MediaRecorder(mediaStream,mimeType?{mimeType}:undefined);
+      voiceChunks=[]; voiceBlob=null;
+      mediaRecorder.addEventListener('dataavailable',e=>{if(e.data.size)voiceChunks.push(e.data);});
+      mediaRecorder.addEventListener('stop',()=>{
+        voiceBlob=new Blob(voiceChunks,{type:mediaRecorder.mimeType||'audio/webm'});
+        mediaStream.getTracks().forEach(track=>track.stop());
+        mediaStream=null;
+      });
+      mediaRecorder.start();
+    }catch(e){vStatus.textContent='无法使用麦克风，请检查权限或改用文字输入';return;}
+    rec=true; recSec=0; vTimer.textContent='00:00';
+    vOrb.classList.add('recording');
+    vStatus.textContent='正在录音，再次点击结束';
+    vBars.classList.add('on');
+    recTimer=setInterval(()=>{
+      recSec++;
+      vTimer.textContent=String(Math.floor(recSec/60)).padStart(2,'0')+':'+String(recSec%60).padStart(2,'0');
+      vBars.querySelectorAll('.bar').forEach(b=>b.style.height=(3+Math.random()*24)+'px');
+    },1000);
+  } else {
+    rec=false;
+    await stopRecording();
+    vOrb.classList.remove('recording');
+    if(voiceBlob && voiceBlob.size > 0){
+      vStatus.textContent='录音完成，点击"合鸣发芽"生成回声';
+    } else {
+      vStatus.textContent='录音太短，请重新录制';
+    }
+    vBars.classList.remove('on');
+    clearInterval(recTimer);
+    vBars.querySelectorAll('.bar').forEach(b=>b.style.height='4px');
+  }
+});
+
+const photoInput=document.getElementById('photoInput');
+const photoPreview=document.getElementById('photoPreview');
+const photoPreviewImg=document.getElementById('photoPreviewImg');
+document.getElementById('photoAdd').addEventListener('click',()=>photoInput.click());
+photoPreview.addEventListener('click',()=>photoInput.click());
+photoInput.addEventListener('change',async()=>{
+  const file=photoInput.files&&photoInput.files[0];
+  if(!file)return;
+  try{
+    const url=await prepareImage(file);
+    if(selectedPhotoUrl)URL.revokeObjectURL(selectedPhotoUrl);
+    selectedPhoto=file;
+    selectedPhotoUrl=URL.createObjectURL(file);
+    photoPreviewImg.src=selectedPhotoUrl;
+    photoPreview.hidden=false;
+    photoPreview.classList.add('selected');
+  }catch(e){alert(e.message);photoInput.value='';}
+});
+
+// ===== DOODLE =====
+const cvs = document.getElementById('doodleCvs');
+const ctx = cvs.getContext('2d');
+let drawing=false, hasDoodle=false, dColor='#B8A08A', dSize=4;
+// 颜色名称 → 真实色值映射表（直接写死，不依赖CSS变量解析，确保可靠）
+const DOODLE_COLOR_MAP = {
+  'var(--warm-gold)':      '#B8A08A',
+  'var(--accent)':         '#7DB88A',
+  'var(--stage-sprout)':   '#E8B4BC',
+  'var(--illus-soil)':     '#8B7355',
+  'var(--illus-ocean)':    '#9CB8C8'
+};
+function resizeCvs(){const w=cvs.parentElement;const d=window.devicePixelRatio||1;cvs.width=w.clientWidth*d;cvs.height=w.clientHeight*d;cvs.style.width=w.clientWidth+'px';cvs.style.height=w.clientHeight+'px';ctx.scale(d,d);ctx.lineCap='round';ctx.lineJoin='round';}
+setTimeout(resizeCvs,100);
+function gp(e){const r=cvs.getBoundingClientRect();const t=e.touches?e.touches[0]:e;return{x:t.clientX-r.left,y:t.clientY-r.top};}
+function applyStroke(){ctx.strokeStyle=dColor;ctx.lineWidth=dSize;ctx.lineCap='round';ctx.lineJoin='round';}
+cvs.addEventListener('mousedown',e=>{drawing=true;applyStroke();const p=gp(e);ctx.beginPath();ctx.moveTo(p.x,p.y);});
+cvs.addEventListener('mousemove',e=>{if(!drawing)return;hasDoodle=true;applyStroke();const p=gp(e);ctx.lineTo(p.x,p.y);ctx.stroke();});
+cvs.addEventListener('mouseup',()=>drawing=false);
+cvs.addEventListener('mouseleave',()=>drawing=false);
+cvs.addEventListener('touchstart',e=>{e.preventDefault();drawing=true;applyStroke();const p=gp(e);ctx.beginPath();ctx.moveTo(p.x,p.y);},{passive:false});
+cvs.addEventListener('touchmove',e=>{e.preventDefault();if(!drawing)return;hasDoodle=true;applyStroke();const p=gp(e);ctx.lineTo(p.x,p.y);ctx.stroke();},{passive:false});
+cvs.addEventListener('touchend',()=>drawing=false);
+function resolveDoodleColor(cssValue){
+  if(!cssValue)return '#B8A08A';
+  const key=String(cssValue).trim();
+  // 优先查映射表（最可靠）
+  if(DOODLE_COLOR_MAP[key])return DOODLE_COLOR_MAP[key];
+  // 直接是#rgb/rgb()格式
+  if(/^#[0-9a-fA-F]{3,8}$|^rgba?\(|^hsla?\(/.test(key))return key;
+  // 尝试解析var()
+  const m=key.match(/^var\(\s*(--[\w-]+)\s*\)/);
+  if(m){
+    const v=getComputedStyle(document.documentElement).getPropertyValue(m[1]).trim();
+    if(v)return v;
+  }
+  return '#B8A08A';
+}
+document.querySelectorAll('.d-color').forEach(c=>{
+  c.addEventListener('click',()=>{
+    document.querySelectorAll('.d-color').forEach(x=>x.classList.remove('active'));
+    c.classList.add('active');
+    const newColor=resolveDoodleColor(c.dataset.c);
+    dColor=newColor;
+    // 立即设置一次上下文颜色
+    ctx.strokeStyle=newColor;
+  });
+});
+// 初始化默认颜色
+(function initDoodleColor(){
+  const active=document.querySelector('.d-color.active');
+  if(active)dColor=resolveDoodleColor(active.dataset.c);
+  ctx.strokeStyle=dColor;
+  ctx.lineWidth=dSize;
+})();
+document.getElementById('doodleClear').addEventListener('click',()=>{ctx.clearRect(0,0,cvs.width,cvs.height);hasDoodle=false;});
+function exportDoodle(){
+  const out=document.createElement('canvas');out.width=cvs.width;out.height=cvs.height;
+  const outCtx=out.getContext('2d');outCtx.fillStyle='#ffffff';outCtx.fillRect(0,0,out.width,out.height);outCtx.drawImage(cvs,0,0);
+  return out.toDataURL('image/png');
+}
+
+// ===== GENERATE =====
+document.getElementById('genBtn').addEventListener('click', startSprouting);
+async function startSprouting() {
+  if(generating)return;
+  let request;
+  try{
+    if(activeInput==='text'){
+      const content=document.querySelector('.j-textarea').value.trim();
+      if(!content)throw new Error('请先写下一些内容');
+      request=()=>apiGenerate('text',content,curTheme);
+    }else if(activeInput==='voice'){
+      if(rec){rec=false;await stopRecording();vOrb.classList.remove('recording');vBars.classList.remove('on');clearInterval(recTimer);}
+      if(!voiceBlob||!voiceBlob.size)throw new Error('请先完成一段录音');
+      request=()=>apiGenerateVoice(voiceBlob,curTheme);
+    }else if(activeInput==='photo'){
+      if(!selectedPhoto)throw new Error('请先选择或拍摄一张照片');
+      const content=await prepareImage(selectedPhoto);
+      request=()=>apiGenerate('image',content,curTheme);
+    }else{
+      if(!hasDoodle)throw new Error('请先画下一些内容');
+      request=()=>apiGenerate('doodle',exportDoodle(),curTheme);
+    }
+  }catch(err){alert(err.message);return;}
+  generating=true;
+  const genBtn=document.getElementById('genBtn');
+  genBtn.disabled=true;
+  show('sprouting');
+  document.querySelectorAll('.sprout-phase').forEach(x=>x.classList.remove('active'));
+  document.getElementById('sp1').classList.add('active');
+
+  let result;
+  try {
+    [, result] = await Promise.all([wait(1200), request()]);
+  } catch(err) {
+    let msg = err.message;
+    if(msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('Load failed')) {
+      msg = '网络连接失败，请检查网络后重试';
+    } else if(msg.includes('413') || msg.includes('Request Entity')) {
+      msg = '文件太大了，请选择更小的文件';
+    }
+    alert('生成失败：' + msg);
+    show('journal');
+    generating=false;
+    genBtn.disabled=false;
+    return;
+  }
+
+  // Phase 2: 叙事展示 + 文字逐字弹出
+  document.getElementById('sp1').classList.remove('active');
+  document.getElementById('sp2').classList.add('active');
+  const narEl = document.getElementById('genNarrative');
+  narEl.innerHTML = '';
+  const narrative = result.narrative || '';
+  for (const ch of narrative) {
+    const span = document.createElement('span');
+    span.className = 'char';
+    span.textContent = ch;
+    narEl.appendChild(span);
+    await wait(45);
+  }
+  await wait(500);
+
+  // Phase 3: 音频波形 + 预加载音频
+  document.getElementById('sp2').classList.remove('active');
+  document.getElementById('sp3').classList.add('active');
+  buildGenWaveform();
+  if (result.audio_url) {
+    try { const pre = new Audio(result.audio_url); pre.preload = 'auto'; } catch(e) {}
+  }
+  await wait(1800);
+
+  // 展示回声卡片
+  const d = new Date();
+  const dateStr = (d.getMonth()+1)+'月'+d.getDate()+'日';
+  showEchoCard('bloom', (result.narrative||'').slice(0,12) || '回声', dateStr, result.narrative, result.audio_url, activeInput==='photo'?'image':activeInput, result.image_url || (activeInput==='photo' ? selectedPhotoUrl : null));
+
+  // 刷新时间线
+  loadTimelineData();
+  generating=false;
+  genBtn.disabled=false;
+}
+// 生成音频波形柱状图（40根随机高度柱子，循环跳动）
+function buildGenWaveform() {
+  const wrap = document.getElementById('genWaveform');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  for (let i = 0; i < 40; i++) {
+    const bar = document.createElement('div');
+    bar.className = 'bar';
+    const h = 8 + Math.random() * 32;
+    bar.style.setProperty('--h', h + 'px');
+    bar.style.height = '4px';
+    bar.style.animationDelay = (i * 0.05) + 's';
+    wrap.appendChild(bar);
+  }
+}
+
+// ===== AUDIO PLAYER =====
+let playing=false;
+const pBtn=document.getElementById('playBtn');
+const pFill=document.getElementById('pFill');
+const pCur=document.getElementById('pCur');
+const pWave=document.getElementById('pWave');
+for(let i=0;i<45;i++){const b=document.createElement('div');b.className='bar';b.style.height=(3+Math.random()*20)+'px';pWave.appendChild(b);}
+
+function setupAudio(url){
+  if(audioEl){try{audioEl.pause();}catch(e){}}
+  if(!url){audioEl=null;return;}
+  audioEl=new Audio(url);
+  audioEl.addEventListener('timeupdate',()=>{
+    if(!audioEl.duration)return;
+    const pct=(audioEl.currentTime/audioEl.duration)*100;
+    pFill.style.width=pct+'%';
+    pCur.textContent=fmtT(audioEl.currentTime);
+    const n=Math.floor((pct/100)*pWave.children.length);
+    Array.from(pWave.children).forEach((b,i)=>{b.classList.toggle('on',i<n);});
+  });
+  audioEl.addEventListener('loadedmetadata',()=>{
+    const durEl=document.querySelector('.pdur');
+    if(durEl) durEl.textContent=fmtT(audioEl.duration);
+  });
+  audioEl.addEventListener('ended',()=>{
+    playing=false;
+    pBtn.innerHTML='<svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2l10 6-10 6V2z"/></svg>';
+  });
+}
+
+pBtn.addEventListener('click',()=>{
+  if(!audioEl){return;}
+  playing?pauseP():startP();
+});
+function startP(){
+  if(!audioEl)return;
+  playing=true;
+  pBtn.innerHTML='<svg viewBox="0 0 16 16" fill="currentColor"><rect x="3.5" y="3" width="3" height="10" rx="1"/><rect x="9.5" y="3" width="3" height="10" rx="1"/></svg>';
+  audioEl.play();
+}
+function pauseP(){
+  if(!audioEl)return;
+  playing=false;
+  pBtn.innerHTML='<svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2l10 6-10 6V2z"/></svg>';
+  audioEl.pause();
+}
+function resetP(){
+  if(audioEl){audioEl.pause();audioEl.currentTime=0;}
+  playing=false;
+  pBtn.innerHTML='<svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2l10 6-10 6V2z"/></svg>';
+  pFill.style.width='0%';
+  pCur.textContent='00:00';
+}
+const resetPlayer = resetP;
+
+// ===== ARCHIVE BTN =====
+document.getElementById('archiveBtn').addEventListener('click',()=>show('archive'));
+
+// ===== INIT =====
+show('calHome');
+applyTier(currentTier);
+loadTimelineData();
+apiGetTheme().then(t=>{curTheme=t.text||'';document.getElementById('journalPrompt').textContent='「'+curTheme+'」';}).catch(()=>{});
+// 检测后端 Demo 模式
+(async function checkBackend(){
+  try{
+    const r = await fetch(API_BASE + '/api/status');
+    if(r.ok){
+      const d = await r.json();
+      BACKEND_DEMO_MODE = d.demo_mode || false;
+      if(BACKEND_DEMO_MODE){
+        console.log('[EchoEtch] 后端 Demo 模式：语音识别使用占位文本，TTS 不可用');
+      }
+    }
+  }catch(e){}
+})();
+})();
+</script>
+
+
+</body>
+</html>
