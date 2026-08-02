@@ -8,7 +8,7 @@
   随手记录此刻 —— AI 将你的文字、照片、语音转译为冥想式叙事，合成治愈系语音，沉淀为情绪日记。
 </p>
 
-<p>
+<p align="center">
   <img alt="Python" src="https://img.shields.io/badge/Python-3.8+-blue?logo=python&logoColor=white">
   <img alt="Flask" src="https://img.shields.io/badge/Flask-3.0+-black?logo=flask&logoColor=white">
   <img alt="Platform" src="https://img.shields.io/badge/Platform-Web%20%7C%20Mobile-green?logo=googlechrome&logoColor=white">
@@ -16,7 +16,9 @@
   <img alt="License" src="https://img.shields.io/badge/License-MIT-yellow">
 </p>
 
-**[在线演示](http://localhost:8721)** · **[路演预览](http://localhost:8721/preview)** · **[架构文档](ARCHITECTURE.md)** · **[产品需求文档](《聲畫合鳴》完整产品需求分析书（PRD）.md)**
+<p align="center">
+  <a href="http://localhost:8721">在线演示</a> · <a href="http://localhost:8721/preview">路演预览</a> · <a href="ARCHITECTURE.md">架构文档</a> · <a href="《聲畫合鳴》完整产品需求分析书（PRD）.md">产品需求文档</a>
+</p>
 
 ---
 
