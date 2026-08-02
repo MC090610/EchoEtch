@@ -17,7 +17,7 @@
 </p>
 
 <p align="center">
-  <a href="http://localhost:8721">在线演示</a> · <a href="http://localhost:8721/preview">路演预览</a> · <a href="ARCHITECTURE.md">架构文档</a> · <a href="《聲畫合鳴》完整产品需求分析书（PRD）.md">产品需求文档</a>
+  <a href="https://sshm.heang.top">在线演示</a> · <a href="https://sshm.heang.top/preview">路演预览</a> · <a href="ARCHITECTURE.md">架构文档</a> · <a href="《聲畫合鳴》完整产品需求分析书（PRD）.md">产品需求文档</a>
 </p>
 
 ---
