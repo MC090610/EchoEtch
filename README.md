@@ -1,6 +1,12 @@
-# 聲畫合鳴 EchoEtch
+<p align="center">
+  <img src="docs/logo.jpg" alt="聲畫合鳴 EchoEtch Logo" width="160">
+</p>
 
-> 随手记录此刻 —— AI 将你的文字、照片、语音转译为冥想式叙事，合成治愈系语音，沉淀为情绪日记。
+<h1 align="center">聲畫合鳴 EchoEtch</h1>
+
+<p align="center">
+  随手记录此刻 —— AI 将你的文字、照片、语音转译为冥想式叙事，合成治愈系语音，沉淀为情绪日记。
+</p>
 
 <p>
   <img alt="Python" src="https://img.shields.io/badge/Python-3.8+-blue?logo=python&logoColor=white">
