@@ -47,3 +47,7 @@ demo/data/audio/*.webm
 *.tmp
 *.bak
 temp/
+
+# git damaged backup
+.git_bak_damaged/
+
